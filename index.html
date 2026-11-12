@@ -1,0 +1,4378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bão Thép — Đại Chiến Xe Tăng</title>
+
+<style>
+:root{
+    --gold:#ffe9aa;
+    --ink:#26434f;
+    --blue:#286b88;
+}
+*{box-sizing:border-box}
+html,body{
+    margin:0;width:100%;height:100%;overflow:hidden;
+    background:#102d40;font-family:Arial,sans-serif;color:white
+}
+body{display:flex;align-items:center;justify-content:center}
+button,input{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+button:disabled{opacity:.45;cursor:not-allowed}
+#stage{
+    position:relative;width:1200px;height:760px;flex-shrink:0;
+    overflow:hidden;transform-origin:center;
+    background:#82d8e2;border-radius:15px;
+    box-shadow:0 15px 70px #0008
+}
+#game{
+    display:block;width:1200px;height:760px;
+    touch-action:none;user-select:none;
+    -webkit-user-select:none;-webkit-touch-callout:none
+}
+#hud{
+    position:absolute;top:12px;left:15px;right:15px;
+    display:flex;gap:10px;align-items:flex-start;
+    pointer-events:none;z-index:3
+}
+#hud>*{pointer-events:auto}
+.profile{
+    width:230px;min-height:62px;text-align:left;
+    padding:8px 13px;border:3px solid #efd18a;border-radius:14px;
+    background:linear-gradient(#386a74,#204a59);color:white;
+    box-shadow:0 4px 0 #79603f
+}
+.profile strong{display:block;font-size:18px}
+.profile small{display:block;margin-top:5px;color:#ffe49c}
+.wallet{
+    display:flex;gap:8px;justify-content:center;flex:1
+}
+.pill{
+    min-width:143px;padding:10px 14px;border-radius:24px;
+    border:2px solid #e9e6b6;background:#255363ed;
+    box-shadow:0 3px 0 #254553;font-weight:bold;font-size:17px
+}
+.pill span{margin-right:7px;font-size:22px}
+.tools{display:flex;gap:7px}
+.tool{
+    width:43px;height:43px;border-radius:12px;
+    border:2px solid #fff0bc;background:linear-gradient(#65a4b6,#31617e);
+    color:white;font-size:21px;box-shadow:0 3px 0 #244353
+}
+#lobbyUI{position:absolute;inset:0;pointer-events:none}
+#lobbyUI button,#lobbyUI input{pointer-events:auto}
+#side{
+    position:absolute;right:15px;top:115px;
+    display:flex;flex-direction:column;gap:12px
+}
+.sidebtn{
+    width:83px;height:78px;border:3px solid #ffedb6;border-radius:18px;
+    background:linear-gradient(#eaffd0,#85cd8b);color:#2c6148;
+    box-shadow:0 4px 0 #437755;font-weight:bold
+}
+.sidebtn b{display:block;font-size:29px;margin-bottom:4px}
+#dock{
+    position:absolute;bottom:15px;left:15px;right:15px;
+    display:flex;justify-content:space-between;align-items:flex-end
+}
+.brand{
+    border:2px solid #ceeeec;border-radius:13px;
+    background:#194453ed;padding:11px 16px;box-shadow:0 4px 0 #143444
+}
+.brand strong{font-size:24px;color:#ffe795;letter-spacing:2px}
+.brand small{display:block;margin-top:4px;font-size:12px;color:#d4f5fa}
+.dockgroup{display:flex;gap:9px}
+.dockbtn{
+    min-width:102px;height:69px;border-radius:16px;
+    border:3px solid #fff0bc;background:linear-gradient(#fff1af,#eab15a);
+    color:#5f422b;box-shadow:0 5px 0 #90643e;font-weight:bold
+}
+.dockbtn b{display:block;font-size:27px;margin-bottom:2px}
+.dockbtn:hover,.sidebtn:hover{filter:brightness(1.08)}
+#chat{
+    position:absolute;bottom:97px;left:15px;
+    width:326px;border:2px solid #b4dce0;border-radius:12px;
+    overflow:hidden;background:#173e50c9
+}
+.chathead{
+    padding:7px 11px;background:#295b6ccd;
+    font-weight:bold;color:#fff0b1;font-size:13px
+}
+#chatlog{
+    height:85px;overflow:auto;padding:8px 11px;
+    font-size:13px;line-height:1.6;pointer-events:auto
+}
+#chatlog div{color:#d8f4ee}
+#chatlog .reward{color:#ffe68b}
+.chatinput{display:flex;background:#d6f5f0;padding:5px;gap:5px}
+#chatInput{
+    width:100%;min-width:0;border:0;outline:none;
+    border-radius:7px;padding:7px;color:#264754;font-size:13px
+}
+#chatSend{
+    border:0;border-radius:7px;background:#3881a0;color:white;
+    padding:5px 10px;font-weight:bold
+}
+#battleUI{display:none;position:absolute;inset:0;pointer-events:none}
+#battleUI button,#battleUI input{pointer-events:auto}
+#scorebar{
+    position:absolute;top:88px;left:20px;right:20px;
+    display:flex;justify-content:space-between;align-items:center
+}
+.badge{
+    border:2px solid #c2edf0;background:#163e54e8;
+    padding:9px 16px;border-radius:18px;box-shadow:0 3px 0 #193647;
+    font-weight:bold;font-size:16px
+}
+#matchScore{min-width:360px;text-align:center}
+#playerStatus{
+    position:absolute;left:20px;top:140px;width:260px;
+    background:#183f50cc;border:1px solid #a5d4d9;
+    border-radius:12px;padding:9px 12px;font-size:14px
+}
+.hpbar{height:13px;background:#122d3c;border-radius:8px;overflow:hidden;margin:6px 0}
+.hpbar i{display:block;height:100%;background:linear-gradient(90deg,#57bf99,#cbef86)}
+#statusText{font-size:12px;color:#d3f6f7}
+#joystick{
+    position:absolute;left:30px;bottom:34px;width:132px;height:132px;
+    border:3px solid #c3eff5a6;border-radius:50%;
+    background:radial-gradient(#9ed9e72b,#224b67b0);
+    box-shadow:inset 0 0 20px #102d4780;
+    pointer-events:auto;touch-action:none
+}
+#joystick:before{
+    content:"";position:absolute;inset:25px;border-radius:50%;
+    border:1px dashed #e0f9fa70
+}
+#stick{
+    position:absolute;width:57px;height:57px;left:34.5px;top:34.5px;
+    border:3px solid #dcffff;border-radius:50%;
+    background:linear-gradient(#a2e4ed,#4b91ae);
+    box-shadow:0 4px 8px #0005;pointer-events:none
+}
+#moveLabel{
+    position:absolute;left:45px;bottom:12px;color:#c5edf1;
+    font-size:12px;font-weight:bold
+}
+#combatActions{
+    position:absolute;right:25px;bottom:27px;display:flex;
+    gap:11px;align-items:flex-end
+}
+.skillcol{display:flex;flex-direction:column;gap:8px}
+.skill{
+    width:105px;height:54px;border:2px solid #c8f6ef;border-radius:13px;
+    background:linear-gradient(#4582a0,#254a6e);color:white;
+    box-shadow:0 3px 0 #153149;font-weight:bold;font-size:13px
+}
+#fire{
+    width:128px;height:128px;border-radius:50%;
+    border:5px solid #ffebac;background:radial-gradient(#ffdc68,#f18a35,#b94c2a);
+    color:#632e1b;font-size:25px;font-weight:900;
+    box-shadow:0 6px 0 #743721,0 0 24px #ffc24733;
+    touch-action:none
+}
+#fire:active{filter:brightness(1.12)}
+#aimButton{
+    position:absolute;bottom:31px;left:185px;
+    padding:12px 17px;border:2px solid #d5f7ef;border-radius:14px;
+    background:#24516de8;color:white;font-weight:bold
+}
+#battleHint{
+    position:absolute;bottom:8px;left:350px;right:280px;
+    text-align:center;color:#ddf9ff;font-size:12px;
+    text-shadow:0 2px 3px #102c40
+}
+#toast{
+    position:absolute;top:225px;left:50%;transform:translateX(-50%);
+    max-width:890px;border:2px solid #ffe4a0;border-radius:22px;
+    background:#173e53ef;color:#fff3c2;padding:12px 24px;
+    font-weight:bold;text-align:center;box-shadow:0 5px 20px #0004;
+    opacity:0;transition:opacity .15s;pointer-events:none;z-index:8
+}
+#overlay{
+    position:absolute;inset:0;background:#102d40aa;
+    backdrop-filter:blur(4px);display:none;
+    align-items:center;justify-content:center;z-index:10
+}
+.modal{
+    width:960px;max-height:640px;border:5px solid #eed18d;
+    border-radius:22px;background:linear-gradient(#f6faec,#dfeee6);
+    color:#294955;overflow:hidden;
+    box-shadow:0 8px 0 #866447,0 25px 65px #0006
+}
+.modalhead{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:13px 20px;background:linear-gradient(#487f91,#2c536d);
+    color:#fff0bf;border-bottom:3px solid #e9d299
+}
+.modalhead h2{margin:0;font-size:25px}
+.close{
+    width:39px;height:37px;border:2px solid #ffd7af;border-radius:10px;
+    background:#b66652;color:white;font-size:24px;font-weight:bold
+}
+#content{padding:20px;max-height:546px;overflow:auto;line-height:1.5;overscroll-behavior:contain}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{
+    border:2px solid #bfd8ce;border-radius:15px;background:#ffffffe0;
+    padding:16px;box-shadow:0 4px 0 #b6ccc5
+}
+.card h3{margin:6px 0 10px;color:#345d70;font-size:20px}
+.card p{margin:8px 0 12px}
+.icon{font-size:39px}
+.note{
+    border:1px solid #bdd39c;background:#e8f2d3;border-radius:12px;
+    padding:12px 15px;margin-bottom:16px
+}
+.muted{font-size:13px;color:#66828a}
+.price{color:#a37622;font-weight:bold}
+.action{
+    padding:10px 16px;border:2px solid #fff3c8;border-radius:10px;
+    background:linear-gradient(#ffdc81,#e7ac51);color:#61422c;
+    box-shadow:0 3px 0 #a57741;font-weight:bold
+}
+.action.blue{
+    background:linear-gradient(#96e4e9,#50acc4);color:#234c62;
+    border-color:#ddffff;box-shadow:0 3px 0 #4b8190
+}
+.action.red{
+    background:linear-gradient(#f9b4a3,#dc806b);color:#733b30;
+    box-shadow:0 3px 0 #a85f51
+}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.progress{height:12px;border-radius:10px;background:#d4e2da;overflow:hidden;margin:8px 0}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,#58b89b,#b2df78)}
+.stat{font-size:29px;font-weight:bold;color:#34798c}
+.nameinput{
+    width:100%;padding:11px;border:2px solid #b9d6ce;
+    border-radius:9px;color:#2d5161;background:white
+}
+#rotate{
+    position:fixed;bottom:6px;left:0;right:0;display:none;
+    text-align:center;font-size:12px;color:#ddf6fa;pointer-events:none
+}
+</style>
+</head>
+
+<body>
+<div id="stage">
+    <canvas id="game" width="1200" height="760"></canvas>
+
+    <div id="hud">
+        <button class="profile" data-a="profile">
+            <strong id="name"></strong>
+            <small id="level"></small>
+        </button>
+
+        <div class="wallet">
+            <div class="pill"><span>⚡</span><b id="energy"></b></div>
+            <div class="pill"><span>🪙</span><b id="gold"></b></div>
+            <div class="pill"><span>💎</span><b id="gems"></b></div>
+        </div>
+
+        <div class="tools">
+            <button class="tool" data-a="sound" id="sound">🔊</button>
+            <button class="tool" data-a="fullscreen">⛶</button>
+            <button class="tool" data-a="help">?</button>
+        </div>
+    </div>
+
+    <div id="lobbyUI">
+        <div id="side">
+            <button class="sidebtn" data-a="daily"><b>🎁</b>Quà ngày</button>
+            <button class="sidebtn" data-a="quests"><b>📜</b>Nhiệm vụ</button>
+            <button class="sidebtn" data-a="records"><b>🏅</b>Thành tích</button>
+        </div>
+
+        <div id="chat">
+            <div class="chathead">HỆ THỐNG • Ghi chú cục bộ, không phải chat online</div>
+            <div id="chatlog"></div>
+            <div class="chatinput">
+                <input id="chatInput" maxlength="100"
+                       placeholder="Ghi chú của bạn...">
+                <button id="chatSend">Gửi</button>
+            </div>
+        </div>
+
+        <div id="dock">
+            <div class="brand">
+                <strong>BÃO THÉP</strong>
+                <small>Đại chiến xe tăng • Offline • Lưu trên trình duyệt</small>
+            </div>
+
+            <div class="dockgroup">
+                <button class="dockbtn" data-a="shop"><b>🛒</b>Cửa hàng</button>
+                <button class="dockbtn" data-a="tanks"><b>🚜</b>Xe tăng</button>
+                <button class="dockbtn" data-a="quests"><b>📜</b>Nhiệm vụ</button>
+                <button class="dockbtn" data-a="battle"><b>⚔️</b>Chiến đấu</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="battleUI">
+        <div id="scorebar">
+            <div class="badge" id="modeLabel"></div>
+            <div class="badge" id="matchScore"></div>
+            <button class="tool" style="width:94px;font-size:14px"
+                    data-a="leave">Rời trận</button>
+        </div>
+
+        <div id="playerStatus">
+            <b id="hpText"></b>
+            <div class="hpbar"><i id="hpFill"></i></div>
+            <div id="statusText"></div>
+        </div>
+
+        <div id="joystick"><div id="stick"></div></div>
+        <div id="moveLabel">JOYSTICK DI CHUYỂN</div>
+
+        <button id="aimButton" data-a="aim">🎯 Ngắm tự động</button>
+
+        <div id="combatActions">
+            <div class="skillcol">
+                <button class="skill" id="dash" data-a="dash">💨 Tăng tốc</button>
+                <button class="skill" id="shield" data-a="shield">🛡️ Lá chắn</button>
+                <button class="skill" id="repair" data-a="repair">🔧 Sửa chữa</button>
+            </div>
+            <button id="fire">BẮN<br>GIỮ</button>
+        </div>
+
+        <div id="battleHint">
+            WASD / joystick: di chuyển • Chuột / chạm: ngắm • Giữ BẮN / Space
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <div id="overlay">
+        <div class="modal">
+            <div class="modalhead">
+                <h2 id="title"></h2>
+                <button class="close" data-a="close">×</button>
+            </div>
+            <div id="content"></div>
+        </div>
+    </div>
+</div>
+
+<div id="rotate">📱 Xoay ngang điện thoại để chơi thuận tiện hơn.</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   BÃO THÉP
+   Game offline tự chứa: Canvas, bot, joystick, localStorage.
+   Không thư viện, không ảnh ngoài, không thanh toán tiền thật.
+   ============================================================ */
+
+const W=1200,H=760,MW=1800,MH=1150;
+const KEY="bao_thep_save_v1";
+const $=id=>document.getElementById(id);
+const canvas=$("game"),ctx=canvas.getContext("2d");
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const rand=(a,b)=>a+Math.random()*(b-a);
+const money=n=>Math.floor(n).toLocaleString("vi-VN");
+const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",
+    '"':"&quot;","'":"&#39;"
+}[c]));
+
+const TANKS=[
+    {
+        id:"rookie",name:"Tiên Phong",icon:"🚜",
+        color:"#e5c55d",hp:150,speed:175,
+        damage:23,rate:.43,bulletSpeed:540,
+        blast:0,pellets:1,cost:0,
+        desc:"Cân bằng, dễ điều khiển, phù hợp mọi trận."
+    },
+    {
+        id:"scout",name:"Tia Chớp",icon:"⚡",
+        color:"#75d69f",hp:118,speed:224,
+        damage:17,rate:.28,bulletSpeed:590,
+        blast:0,pellets:1,cost:650,
+        desc:"Nhanh và bắn liên tục, nhưng giáp mỏng."
+    },
+    {
+        id:"fortress",name:"Thiết Giáp",icon:"🛡️",
+        color:"#8ebbdc",hp:225,speed:137,
+        damage:30,rate:.59,bulletSpeed:490,
+        blast:0,pellets:1,cost:850,
+        desc:"Máu cao, hỏa lực mạnh, cơ động thấp."
+    },
+    {
+        id:"bomber",name:"Hỏa Bão",icon:"💥",
+        color:"#ec996f",hp:160,speed:160,
+        damage:42,rate:.88,bulletSpeed:410,
+        blast:67,pellets:1,cost:1100,
+        desc:"Đạn nổ lan, phá thùng và đánh nhóm mục tiêu."
+    },
+    {
+        id:"plasma",name:"Lam Quang",icon:"🔷",
+        color:"#ad8de3",hp:142,speed:183,
+        damage:34,rate:.62,bulletSpeed:790,
+        blast:0,pellets:1,cost:1250,
+        desc:"Đạn năng lượng tốc độ cao, mạnh ở tầm xa."
+    }
+];
+
+function day(){
+    const d=new Date();
+    return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function initialSave(){
+    return{
+        name:"Chỉ Huy Mới",gold:1100,gems:20,
+        energy:190,energyAt:Date.now(),
+        level:1,xp:0,tank:"rookie",owned:["rookie"],
+        upgrades:{rookie:0,scout:0,fortress:0,bomber:0,plasma:0},
+        sound:true,daily:"",activity:"",
+        claimed:[],
+        stats:{
+            played:0,wins:0,kills:0,damage:0,
+            boss:0,upgrades:0,best:0
+        }
+    };
+}
+
+function load(){
+    const base=initialSave();
+    try{
+        const r=JSON.parse(localStorage.getItem(KEY)||"null");
+        if(!r||typeof r!=="object")return base;
+
+        for(const k of ["gold","gems","energy","level","xp"]){
+            if(Number.isFinite(r[k]))base[k]=Math.floor(Math.max(0,r[k]));
+        }
+        base.energy=clamp(base.energy,0,200);
+        base.level=clamp(base.level,1,999);
+
+        if(typeof r.name==="string")
+            base.name=r.name.trim().slice(0,18)||base.name;
+
+        if(Array.isArray(r.owned))
+            base.owned=[...new Set(["rookie",...r.owned.filter(
+                id=>TANKS.some(t=>t.id===id)
+            )])];
+
+        if(base.owned.includes(r.tank))base.tank=r.tank;
+
+        if(r.upgrades&&typeof r.upgrades==="object"){
+            for(const t of TANKS){
+                if(Number.isFinite(r.upgrades[t.id]))
+                    base.upgrades[t.id]=clamp(Math.floor(r.upgrades[t.id]),0,5);
+            }
+        }
+
+        if(r.stats&&typeof r.stats==="object"){
+            for(const k of Object.keys(base.stats)){
+                if(Number.isFinite(r.stats[k]))
+                    base.stats[k]=Math.floor(Math.max(0,r.stats[k]));
+            }
+        }
+
+        if(Number.isFinite(r.energyAt))
+            base.energyAt=clamp(r.energyAt,0,Date.now());
+
+        for(const k of ["daily","activity"])
+            if(typeof r[k]==="string")base[k]=r[k];
+
+        if(Array.isArray(r.claimed))
+            base.claimed=r.claimed.filter(v=>typeof v==="string");
+
+        base.sound=r.sound!==false;
+    }catch(e){
+        console.warn("Dùng tiến trình mới.",e);
+    }
+    return base;
+}
+
+let S=load();
+let scene="lobby",B=null,time=0;
+let modal=false,onClose=null,hover=null;
+let toastEnd=0,storageWarned=false;
+let audio=null,lastSound=0;
+let canvasPointer=null,stickPointer=null;
+
+const input={
+    x:0,y:0,fire:false,mouseFire:false,
+    auto:true,aimX:900,aimY:500
+};
+const keys={};
+
+function fit(){
+    const portrait=innerHeight>innerWidth;
+    const s=Math.min(innerWidth/W,(innerHeight-(portrait?28:0))/H);
+    $("stage").style.transform=`scale(${s})`;
+    $("rotate").style.display=portrait?"block":"none";
+}
+addEventListener("resize",fit);
+document.addEventListener("fullscreenchange",fit);
+fit();
+
+const DPR=Math.min(devicePixelRatio||1,1.5);
+canvas.width=Math.round(W*DPR);
+canvas.height=Math.round(H*DPR);
+ctx.setTransform(DPR,0,0,DPR,0,0);
+
+function hud(){
+    $("name").textContent=S.name;
+    $("level").textContent=
+        `Lv.${S.level} • ${TANKS.find(t=>t.id===S.tank).name} +${S.upgrades[S.tank]}`;
+    $("energy").textContent=`${S.energy}/200`;
+    $("gold").textContent=money(S.gold);
+    $("gems").textContent=money(S.gems);
+    $("sound").textContent=S.sound?"🔊":"🔇";
+}
+
+function save(){
+    try{
+        localStorage.setItem(KEY,JSON.stringify(S));
+    }catch(e){
+        if(!storageWarned){
+            storageWarned=true;
+            toast("Trình duyệt chặn lưu: tiến trình chỉ giữ trong phiên này.",4);
+        }
+    }
+    hud();
+}
+
+function regen(){
+    const n=Math.floor((Date.now()-S.energyAt)/120000);
+    if(n>0){
+        S.energy=Math.min(200,S.energy+n);
+        S.energyAt+=n*120000;
+        save();
+    }
+}
+
+function log(message,reward=false){
+    const div=document.createElement("div");
+    div.textContent=message;
+    if(reward)div.className="reward";
+    $("chatlog").appendChild(div);
+    while($("chatlog").children.length>30)
+        $("chatlog").firstChild.remove();
+    $("chatlog").scrollTop=$("chatlog").scrollHeight;
+}
+
+function toast(message,seconds=2.7){
+    $("toast").textContent=message;
+    $("toast").style.opacity=1;
+    toastEnd=performance.now()+seconds*1000;
+}
+
+function sound(kind="click"){
+    if(!S.sound)return;
+    const nowMs=performance.now();
+    if(kind==="shot"&&nowMs-lastSound<90)return;
+    if(kind==="shot")lastSound=nowMs;
+
+    try{
+        if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();
+        if(audio.state==="suspended")audio.resume();
+        const o=audio.createOscillator(),g=audio.createGain();
+        o.connect(g);g.connect(audio.destination);
+        const presets={
+            click:[620,410,.07,"sine",.05],
+            shot:[160,55,.09,"triangle",.055],
+            hit:[115,35,.13,"triangle",.075],
+            boom:[90,20,.3,"sawtooth",.07],
+            win:[420,940,.45,"sine",.08],
+            heal:[380,790,.22,"sine",.06]
+        };
+        const p=presets[kind]||presets.click,n=audio.currentTime;
+        o.type=p[3];
+        o.frequency.setValueAtTime(p[0],n);
+        o.frequency.exponentialRampToValueAtTime(p[1],n+p[2]);
+        g.gain.setValueAtTime(p[4],n);
+        g.gain.exponentialRampToValueAtTime(.001,n+p[2]);
+        o.start(n);o.stop(n+p[2]+.02);
+    }catch(e){}
+}
+
+function clearInput(){
+    input.x=0;input.y=0;input.fire=false;input.mouseFire=false;
+    for(const k of Object.keys(keys))delete keys[k];
+    stickPointer=null;canvasPointer=null;
+    $("stick").style.transform="";
+}
+
+function show(title,html,callback=null){
+    modal=true;onClose=callback;
+    $("title").textContent=title;
+    $("content").innerHTML=html;
+    $("content").scrollTop=0;
+    $("overlay").style.display="flex";
+    clearInput();
+}
+
+function close(run=true){
+    const callback=onClose;
+    modal=false;onClose=null;
+    $("overlay").style.display="none";
+    if(run&&callback)callback();
+}
+
+/* =================== CÔNG CỤ VẼ =================== */
+
+function poly(points,fill,stroke=null,line=2){
+    ctx.beginPath();
+    points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));
+    ctx.closePath();
+    if(fill){ctx.fillStyle=fill;ctx.fill()}
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=line;ctx.stroke()}
+}
+
+function oval(x,y,rx,ry,fill,stroke=null,line=2){
+    ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);
+    if(fill){ctx.fillStyle=fill;ctx.fill()}
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=line;ctx.stroke()}
+}
+
+function box(x,y,w,h,fill,r=0,stroke=null){
+    ctx.beginPath();ctx.roundRect(x,y,w,h,r);
+    ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}
+}
+
+function txt(s,x,y,size=20,fill="#fff",stroke="#365662",align="center"){
+    ctx.font=`900 ${size}px Arial`;
+    ctx.textAlign=align;ctx.textBaseline="middle";
+    if(stroke){
+        ctx.lineWidth=Math.max(3,size*.16);
+        ctx.lineJoin="round";ctx.strokeStyle=stroke;ctx.strokeText(s,x,y);
+    }
+    ctx.fillStyle=fill;ctx.fillText(s,x,y);
+}
+
+function cloud(x,y,s=1,a=.7){
+    ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.globalAlpha=a;
+    oval(0,0,49,16,"#f3ffff");
+    oval(-25,-8,24,20,"#f3ffff");
+    oval(10,-16,29,24,"#f3ffff");
+    oval(38,-4,26,18,"#f3ffff");
+    ctx.restore();
+}
+
+function tree(x,y,s=1){
+    ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+    oval(3,3,27,10,"#234d4828");
+    poly([[-6,1],[7,1],[8,-44],[-4,-48]],"#9d7751","#6b6747");
+    oval(-18,-44,24,22,"#369b60","#4a8851");
+    oval(19,-45,25,24,"#54b66a");
+    oval(1,-62,30,26,"#65c76e","#4b9958");
+    oval(-8,-71,20,13,"#9bdd7e");
+    oval(22,-54,13,10,"#9bdc79");
+    ctx.restore();
+}
+
+function lerpAngle(a,b,t){
+    const d=Math.atan2(Math.sin(b-a),Math.cos(b-a));
+    return a+d*Math.min(1,t);
+}
+
+/* =================== SẢNH ĐẢO =================== */
+
+const NODES=[
+    {id:"records",x:240,y:193,type:"monument",label:"BẢNG ANH HÙNG"},
+    {id:"duel",x:523,y:294,type:"dome",label:"ĐẤU ĐỘI"},
+    {id:"activity",x:864,y:230,type:"carousel",label:"TRUNG TÂM HOẠT ĐỘNG"},
+    {id:"guild",x:216,y:440,type:"guild",label:"NHÀ CHỈ HUY"},
+    {id:"tanks",x:408,y:462,type:"mech",label:"XƯỞNG XE TĂNG"},
+    {id:"shop",x:639,y:568,type:"shop",label:"SHOP"},
+    {id:"boss",x:875,y:520,type:"portal",label:"PHỤ BẢN BOSS"}
+];
+
+function island(){
+    const points=[
+        [100,270],[178,196],[322,119],[478,117],
+        [620,145],[742,132],[890,157],[1047,245],
+        [1082,364],[1057,506],[959,610],[815,661],
+        [618,675],[428,624],[286,584],[163,455],[96,353]
+    ];
+    poly(points.map(p=>[p[0],p[1]+48]),"#467a80","#315e6c",4);
+
+    for(let i=0;i<points.length-1;i+=2){
+        const a=points[i],b=points[i+1];
+        poly([
+            [a[0],a[1]+16],[b[0],b[1]+16],
+            [(a[0]+b[0])/2,Math.max(a[1],b[1])+88]
+        ],i%4?"#527d7c":"#345e6e");
+    }
+    poly(points,"#83cd72","#d3f5cb",7);
+    oval(597,372,411,208,"#9fda78");
+    oval(637,374,333,170,"#a9de85");
+
+    ctx.lineCap="round";
+    for(const n of NODES){
+        ctx.beginPath();ctx.moveTo(595,401);
+        ctx.quadraticCurveTo((595+n.x)/2,425,n.x,n.y+25);
+        ctx.strokeStyle="#d7d497";ctx.lineWidth=49;ctx.stroke();
+        ctx.strokeStyle="#f0e6af";ctx.lineWidth=35;ctx.stroke();
+    }
+
+    ctx.strokeStyle="#c8bf8490";ctx.lineWidth=1.5;
+    for(let i=0;i<60;i++){
+        const x=310+(i*79)%560,y=240+(i*63)%340;
+        if(Math.abs(x-600)>120&&Math.abs(y-410)>80)continue;
+        poly([[x,y],[x+17,y-9],[x+33,y],[x+16,y+9]],null,"#bbbd84",1);
+    }
+
+    const ts=[
+        [141,302,.9],[182,229,.75],[316,161,.75],[369,180,.6],
+        [422,151,.8],[657,183,.8],[727,150,.8],[776,179,.7],
+        [978,250,.8],[1028,321,.9],[1031,438,.8],[986,537,.75],
+        [914,596,.7],[763,633,.75],[544,611,.7],[307,556,.75],
+        [133,379,.8],[609,244,.6],[760,412,.65],[538,538,.6],
+        [363,346,.65],[934,364,.65],[817,348,.75]
+    ];
+    ts.forEach(t=>tree(...t));
+
+    for(let i=0;i<45;i++){
+        const x=170+(i*151)%820,y=240+(i*73)%370;
+        if(Math.hypot(x-600,y-410)<145)continue;
+        oval(x,y,9,4,"#71b45c");
+        oval(x-3,y-3,3,3,i%2?"#ffdc86":"#ffd6a9");
+        oval(x+4,y-5,3,3,"#fff5d2");
+    }
+}
+
+function building(n){
+    ctx.save();ctx.translate(n.x,n.y);
+    const active=hover===n.id;
+
+    oval(0,24,83,29,"#2c5c4140");
+    oval(0,17,77,26,"#c7cc95","#f4e6b8",3);
+
+    if(active){
+        oval(0,17,87+Math.sin(time*5)*3,31,null,"#fff0a0",3);
+    }
+
+    if(n.type==="dome"){
+        oval(0,-4,99,46,"#bb965a","#f3d797",4);
+        box(-81,-54,162,57,"#e1bd75",8,"#a38756");
+
+        for(let i=0;i<7;i++)
+            box(-72+i*23,-49,15,42,"#795e4a",5,"#e8ce8a");
+
+        oval(0,-57,95,47,"#e7c66f","#f8e4a0",4);
+        oval(0,-70,73,44,"#ddbd69","#f6d895",3);
+        oval(0,-87,49,39,"#edcf78","#ffe8a9",3);
+
+        ctx.strokeStyle="#ad934f";ctx.lineWidth=4;
+        for(let i=-2;i<=2;i++){
+            ctx.beginPath();
+            ctx.moveTo(i*17,-120);
+            ctx.quadraticCurveTo(i*27,-83,i*35,-52);
+            ctx.stroke();
+        }
+
+        oval(0,-58,31,24,"#6f5c83","#f8df94",4);
+        oval(0,-58,15,12,"#b9a1e7");
+        box(-18,-9,36,37,"#594747",8,"#f2d598");
+        box(-9,-4,18,28,"#2f4856",4);
+
+        for(let i=0;i<6;i++){
+            const a=i*Math.PI/3;
+            oval(Math.cos(a)*81,-51+Math.sin(a)*28,5,6,"#ffedaa");
+        }
+    }
+
+    if(n.type==="carousel"){
+        oval(0,3,80,31,"#a69168","#eddda4",4);
+        oval(0,-5,69,24,"#625b72","#e8d3a0",4);
+        box(-50,-91,100,71,"#5f7188",5);
+
+        for(let i=0;i<7;i++){
+            const x=-64+i*21;
+            box(x-3,-92,6,87,"#e5d296",2,"#8c815f");
+            oval(x,-31,8,11,i%2?"#f1d190":"#d6e8dd");
+        }
+
+        oval(0,-92,81,34,"#72a9c4","#fff0b8",4);
+
+        const center=[0,-161];
+        const edge=[];
+        for(let i=0;i<=12;i++){
+            const a=i*Math.PI/12;
+            edge.push([Math.cos(a)*80,-96+Math.sin(a)*21]);
+        }
+
+        for(let i=0;i<12;i++)
+            poly([center,edge[i],edge[i+1]],
+                 i%2?"#e8e3b7":"#4c95b1","#d8e6d7",1);
+
+        oval(0,-163,8,7,"#eed58f","#fff2b1");
+        for(let i=-3;i<=3;i++)
+            oval(i*22,-78,5,7,"#fff1af","#ac9060");
+
+        txt("★",0,-38,27,"#ffdf84","#54778a");
+    }
+
+    if(n.type==="guild"||n.type==="shop"){
+        const shop=n.type==="shop";
+
+        box(-55,-71,110,74,"#d0b477",5,"#8e774e");
+        poly([[55,-71],[79,-53],[79,4],[55,15]],
+             "#9c855d","#74664d");
+
+        box(-39,-105,78,42,"#e4c68a",5,"#9f875b");
+        poly([[-48,-106],[0,-127],[48,-106],[0,-90]],
+             "#b69556","#eed798",3);
+
+        box(-17,-52,34,61,"#755c43",7,"#f2d797");
+        box(-9,-45,18,51,"#364653",5);
+
+        if(shop){
+            oval(0,-130,41,25,"#e4bc56","#fff0a1",4);
+            oval(0,-149,32,24,"#f5cf69","#fff0ad",3);
+            txt("🪙",0,-148,25,"#e9b64e",null);
+            box(-45,-83,90,24,"#9b7040",4,"#f4d395");
+            txt("SHOP",0,-71,18,"#fff0aa","#735138");
+
+            for(const x of [-69,61]){
+                box(x,1,25,24,"#c59d5c",3,"#856940");
+                poly([[x,1],[x+12,-8],[x+36,0],[x+25,10]],
+                     "#e6c584","#a38655");
+            }
+        }else{
+            box(-20,-145,40,37,"#dfaf59",4,"#8e6a44");
+            poly([[-25,-146],[0,-167],[25,-146]],"#cc8950","#e7b571");
+            box(-4,-190,5,35,"#876f4e",2);
+            poly([[1,-188],[38,-180],[1,-166]],"#eeaa59","#a9753e");
+            txt("G",0,-126,20,"#fff4c0","#94663a");
+        }
+    }
+
+    if(n.type==="monument"){
+        oval(0,13,65,24,"#c3ba8c","#f5e6b6",3);
+        box(-26,-58,52,69,"#b9ac82",4,"#8a7d60");
+        poly([[-30,-60],[0,-78],[31,-60],[0,-45]],
+             "#dfd29b","#9a8b64");
+
+        poly([
+            [-21,-85],[-12,-129],[8,-148],
+            [25,-136],[12,-118],[31,-90],[7,-75]
+        ],"#f0d471","#a88947",3);
+
+        poly([[-12,-125],[-51,-105],[-32,-88],[-5,-110]],
+             "#e9bf62","#a88947",3);
+        txt("★",1,-36,25,"#ffe2a0","#8e7f56");
+    }
+
+    if(n.type==="mech"){
+        // Robot trưng bày tại xưởng xe tăng.
+        oval(0,12,76,25,"#b4c7b4","#e5ecd0",3);
+        for(const x of [-36,17]){
+            box(x,-45,24,50,"#4b7c8f",5,"#274f66");
+            box(x-5,-9,36,17,"#8bc0d0",4,"#355e74");
+        }
+
+        box(-43,-112,86,70,"#e0bf64",10,"#6b765e");
+        box(-29,-96,58,37,"#527e94",7,"#e5d591");
+        box(-22,-91,44,17,"#8fe0ee",4,"#32596e");
+        box(-33,-144,66,34,"#89b7c4",8,"#36596e");
+
+        for(const x of [-75,47]){
+            box(x,-101,28,54,"#d7bb6b",7,"#516c6b");
+            oval(x+14,-52,17,13,"#6d9bb0","#365f76",3);
+        }
+
+        box(-5,-165,10,22,"#e4cf8d",3);
+        oval(0,-166,7,7,"#87edf4","#4d8394");
+        txt("⚙",0,-38,24,"#e9d58b","#4e7888");
+    }
+
+    if(n.type==="portal"){
+        oval(0,12,81,28,"#b7d9bc","#eef7d0",3);
+        ctx.save();ctx.translate(0,-53);
+
+        oval(0,0,64,72,"#4387ad","#e4d593",10);
+        oval(0,0,47,56,"#1f668e","#92ddeb",4);
+
+        for(let i=0;i<8;i++){
+            const a=i*Math.PI/4;
+            ctx.save();ctx.translate(Math.cos(a)*64,Math.sin(a)*70);
+            ctx.rotate(a);
+            box(-10,-10,20,20,i%2?"#dfc270":"#acd7db",3,"#728f8c");
+            ctx.restore();
+        }
+
+        ctx.save();ctx.rotate(time*.7);
+        ctx.strokeStyle="#85f2fb";ctx.lineWidth=3;
+        for(let i=0;i<3;i++){
+            ctx.beginPath();
+            ctx.arc(0,0,14+i*12,i*2,i*2+Math.PI*1.4);
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        ctx.globalAlpha=.4+Math.sin(time*4)*.15;
+        oval(0,0,28,36,"#91e9ff");
+        ctx.globalAlpha=1;
+        txt("⚡",0,0,29,"#c8ffff","#397fa4");
+        ctx.restore();
+
+        for(const x of [-68,64]){
+            box(x-8,-6,16,26,"#758b83",3,"#d2e3c8");
+            oval(x,-9,8,8,"#a4eff3","#548a93");
+        }
+    }
+
+    const labelY={
+        dome:-155,carousel:-199,guild:-214,shop:-190,
+        monument:-174,mech:-191,portal:-155
+    }[n.type];
+
+    txt(n.label,0,labelY,n.type==="carousel"?20:23,
+        active?"#fff4aa":"#ffeb8c","#516449");
+
+    ctx.restore();
+}
+
+function drawLobby(){
+    const sky=ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,"#398fba");
+    sky.addColorStop(.5,"#8fdce2");
+    sky.addColorStop(1,"#63bbd0");
+    ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+
+    for(let i=0;i<9;i++)
+        cloud((i*183+time*6)%1460-120,155+(i%3)*191,
+              .9+(i%2)*.6,.58);
+
+    for(let i=0;i<14;i++){
+        const x=(i*251+14)%W,y=172+(i*127)%530;
+        if(x>100&&x<1070&&y<660)continue;
+        const b=Math.sin(time+i)*4;
+        poly([[x,y+b],[x+24,y-8+b],[x+39,y+13+b],[x+13,y+39+b]],
+             "#59868b","#9ed8d7",2);
+        poly([[x,y+b],[x+24,y-8+b],[x+27,y+10+b],[x+4,y+19+b]],
+             "#bfdbbe");
+    }
+
+    island();
+    [...NODES].sort((a,b)=>a.y-b.y).forEach(building);
+
+    // Thác nhỏ ở mép đảo.
+    ctx.save();ctx.globalAlpha=.65;
+    for(let i=0;i<5;i++){
+        const x=958+i*5;
+        box(x,603,3,55+Math.sin(time*4+i)*8,"#d1ffff",2);
+    }
+    ctx.restore();
+
+    txt("ĐẢO CHỈ HUY",610,99,20,"#fff5ba","#376376");
+
+    for(let i=0;i<23;i++){
+        const x=185+(i*149)%795;
+        const y=190+(i*91)%395+Math.sin(time*2+i)*6;
+        ctx.globalAlpha=.15+.35*(.5+.5*Math.sin(time*3+i));
+        oval(x,y,2.5,2.5,"#fff6a5");
+    }
+    ctx.globalAlpha=1;
+}
+
+/* =================== MENU VÀ KINH TẾ =================== */
+
+function battleMenu(){
+    show("⚔️ Trung Tâm Chiến Đấu",`
+        <div class="note">
+            Đấu offline với bot. Đồng đội và đối thủ đều do máy điều khiển.
+            Mỗi trận thường/cao thủ/Boss tốn <b>8 năng lượng</b>.
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="icon">⚔️</div><h3>Đấu đội 3v3</h3>
+                <p>Đội đạt 10 điểm trước thắng. Giới hạn 3 phút.
+                Xe bị hạ hồi sinh sau 4 giây.</p>
+                <p class="price">Thắng: 180 vàng + 75 XP</p>
+                <button class="action" data-a="play-normal">Vào trận • 8 ⚡</button>
+            </div>
+
+            <div class="card">
+                <div class="icon">🏆</div><h3>Giải đấu cao thủ</h3>
+                <p>3v3 với đối thủ mạnh hơn, ngắm tốt hơn.
+                Giới hạn 3 phút, mục tiêu 10 điểm.</p>
+                <p class="price">Thắng: 280 vàng + 110 XP</p>
+                <button class="action" data-a="play-hard">Thử sức • 8 ⚡</button>
+            </div>
+
+            <div class="card">
+                <div class="icon">🤖</div><h3>Boss Cự Pháo</h3>
+                <p>Bạn và 1 bot đồng đội đối đầu Boss.
+                Bạn có 3 mạng, thời gian 150 giây.</p>
+                <p class="price">Thắng: 400 vàng + 8 💎 + 150 XP</p>
+                <button class="action" data-a="play-boss">Đánh Boss • 8 ⚡</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <button class="action blue" data-a="play-training">
+                🎯 Luyện tập miễn phí
+            </button>
+            <button class="action blue" data-a="help">Hướng dẫn điều khiển</button>
+        </div>
+    `);
+}
+
+function tankMenu(){
+    show("🚜 Nhà Xe Tăng",`
+        <div class="note">
+            Mỗi xe có chỉ số và cách chơi riêng.
+            Xe trang bị hiện tại:
+            <b>${TANKS.find(t=>t.id===S.tank).name}</b>.
+        </div>
+        <div class="grid">
+            ${TANKS.map(t=>`
+                <div class="card">
+                    <div class="icon">${t.icon}</div>
+                    <h3>${t.name} +${S.upgrades[t.id]}</h3>
+                    <p>${t.desc}</p>
+                    <p>
+                        Máu: <b>${t.hp}</b> • Tốc độ: <b>${t.speed}</b><br>
+                        Sát thương: <b>${t.damage}</b> •
+                        Nhịp bắn: <b>${t.rate}s</b>
+                    </p>
+                    <p class="price">
+                        ${S.owned.includes(t.id)?"Đã sở hữu":money(t.cost)+" vàng"}
+                    </p>
+                    <button class="action" data-a="tank" data-id="${t.id}"
+                            ${S.tank===t.id?"disabled":""}>
+                        ${S.tank===t.id?"Đang trang bị":
+                          S.owned.includes(t.id)?"Trang bị":"Mua xe"}
+                    </button>
+                </div>
+            `).join("")}
+        </div>
+    `);
+}
+
+function shopMenu(){
+    const t=TANKS.find(t=>t.id===S.tank),lv=S.upgrades[t.id];
+    show("🛒 Shop & Xưởng Nâng Cấp",`
+        <div class="note">
+            Không có thanh toán tiền thật.
+            Vàng và kim cương kiếm qua trận đấu, nhiệm vụ và quà ngày.
+        </div>
+        <div class="grid">
+            <div class="card">
+                <div class="icon">🔧</div><h3>Nâng cấp ${t.name}</h3>
+                <p>Cấp hiện tại: <b>+${lv}/5</b></p>
+                <p>Mỗi cấp: <b>+10 HP</b> và <b>+3 sát thương</b>.</p>
+                <p class="price">
+                    ${lv>=5?"Đã tối đa":money(230*(lv+1))+" vàng"}
+                </p>
+                <button class="action" data-a="upgrade" ${lv>=5?"disabled":""}>
+                    Nâng cấp
+                </button>
+            </div>
+            <div class="card">
+                <div class="icon">⚡</div><h3>Tiếp tế năng lượng</h3>
+                <p>Đổi 5 kim cương lấy 50 năng lượng.</p>
+                <p class="muted">Tự hồi 1 năng lượng mỗi 2 phút, tối đa 200.</p>
+                <button class="action" data-a="energybuy">5 💎 → 50 ⚡</button>
+            </div>
+            <div class="card">
+                <div class="icon">🚜</div><h3>Mở khóa xe</h3>
+                <p>Chọn xe nhanh, xe giáp cao hoặc pháo nổ lan.</p>
+                <button class="action blue" data-a="tanks">Xem nhà xe</button>
+            </div>
+        </div>
+    `);
+}
+
+const QUESTS=[
+    {id:"first",name:"Xuất kích",desc:"Hoàn thành 1 trận có thưởng.",
+     stat:"played",need:1,gold:130,gems:2},
+    {id:"kills",name:"Thợ săn thép",desc:"Tự hạ tổng cộng 10 xe đối thủ.",
+     stat:"kills",need:10,gold:300,gems:5},
+    {id:"wins",name:"Chỉ huy tài ba",desc:"Thắng 3 trận có thưởng.",
+     stat:"wins",need:3,gold:400,gems:5},
+    {id:"damage",name:"Hỏa lực áp đảo",desc:"Gây tổng cộng 2.000 sát thương.",
+     stat:"damage",need:2000,gold:350,gems:4},
+    {id:"forge",name:"Kỹ sư chiến trường",desc:"Nâng cấp xe 2 lần.",
+     stat:"upgrades",need:2,gold:250,gems:4},
+    {id:"boss",name:"Phá hủy Cự Pháo",desc:"Đánh bại Boss 1 lần.",
+     stat:"boss",need:1,gold:500,gems:10}
+];
+
+function questMenu(){
+    show("📜 Nhiệm Vụ",`
+        <div class="note">
+            Chỉ tính trận hoàn thành, không tính luyện tập hoặc bỏ dở.
+        </div>
+        <div class="grid two">
+            ${QUESTS.map(q=>{
+                const n=Math.min(S.stats[q.stat],q.need);
+                const done=S.claimed.includes(q.id);
+                return`
+                    <div class="card">
+                        <h3>${done?"✅":"📜"} ${q.name}</h3>
+                        <p>${q.desc}</p>
+                        <div class="progress">
+                            <i style="width:${n/q.need*100}%"></i>
+                        </div>
+                        <p>${money(n)}/${money(q.need)}</p>
+                        <p class="price">${q.gold} vàng + ${q.gems} 💎</p>
+                        <button class="action" data-a="claim" data-id="${q.id}"
+                                ${done||n<q.need?"disabled":""}>
+                            ${done?"Đã nhận":n>=q.need?"Nhận thưởng":"Chưa hoàn thành"}
+                        </button>
+                    </div>
+                `;
+            }).join("")}
+        </div>
+    `);
+}
+
+function dailyMenu(){
+    show("🎁 Quà Đăng Nhập",`
+        <div class="card" style="text-align:center">
+            <div class="icon">🎁</div><h3>Tiếp tế hằng ngày</h3>
+            <p class="stat">200 vàng + 3 💎 + 25 ⚡</p>
+            <p class="muted">Mỗi ngày một lần, theo ngày trên thiết bị.</p>
+            <button class="action" data-a="dailyclaim"
+                    ${S.daily===day()?"disabled":""}>
+                ${S.daily===day()?"Đã nhận hôm nay":"Nhận tiếp tế"}
+            </button>
+        </div>
+    `);
+}
+
+function activityMenu(){
+    show("🎪 Trung Tâm Hoạt Động",`
+        <div class="grid two">
+            <div class="card">
+                <div class="icon">🔋</div><h3>Trạm tiếp năng lượng</h3>
+                <p>Nhận 30 năng lượng miễn phí mỗi ngày.</p>
+                <button class="action" data-a="activityclaim"
+                        ${S.activity===day()?"disabled":""}>
+                    ${S.activity===day()?"Đã nhận hôm nay":"Nhận 30 ⚡"}
+                </button>
+            </div>
+            <div class="card">
+                <div class="icon">🏆</div><h3>Giải đấu cao thủ</h3>
+                <p>Thử sức với đội bot được tăng giáp và hỏa lực.</p>
+                <button class="action blue" data-a="play-hard">Vào trận • 8 ⚡</button>
+            </div>
+        </div>
+    `);
+}
+
+function recordsMenu(){
+    show("🏅 Bảng Anh Hùng — Thành Tích Cá Nhân",`
+        <div class="note">
+            Dữ liệu cục bộ, không phải bảng xếp hạng người chơi online.
+        </div>
+        <div class="grid">
+            ${[
+                ["Trận hoàn thành",S.stats.played],
+                ["Chiến thắng",S.stats.wins],
+                ["Xe tự hạ",S.stats.kills],
+                ["Tổng sát thương",S.stats.damage],
+                ["Boss đã hạ",S.stats.boss],
+                ["Kỷ lục hạ xe / trận",S.stats.best]
+            ].map(([label,n])=>`
+                <div class="card"><h3>${label}</h3>
+                    <div class="stat">${money(n)}</div>
+                </div>
+            `).join("")}
+        </div>
+    `);
+}
+
+function guildMenu(){
+    show("🏰 Nhà Chỉ Huy",`
+        <div class="note">
+            Bản này không có Guild hoặc chat mạng.
+            Bạn quản lý đội bot offline và tiến trình cá nhân.
+        </div>
+        <div class="grid two">
+            <div class="card">
+                <h3>Đội hình 3v3</h3>
+                <p>Bạn điều khiển xe chính. Hai bot đồng đội tự tìm,
+                áp sát và bắn đối thủ.</p>
+                <button class="action" data-a="battle">Chọn trận</button>
+            </div>
+            <div class="card">
+                <h3>Hồ sơ chỉ huy</h3>
+                <p>Đổi tên, xem cấp độ và quản lý dữ liệu lưu.</p>
+                <button class="action blue" data-a="profile">Mở hồ sơ</button>
+            </div>
+        </div>
+    `);
+}
+
+function profileMenu(){
+    show("👤 Hồ Sơ Chỉ Huy",`
+        <div class="grid two">
+            <div class="card">
+                <h3>Tên nhân vật</h3>
+                <input id="rename" class="nameinput" maxlength="18"
+                       value="${esc(S.name)}">
+                <div class="row">
+                    <button class="action" data-a="rename">Lưu tên</button>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Cấp ${S.level}</h3>
+                <p>EXP: ${S.xp}/${S.level*100}</p>
+                <div class="progress">
+                    <i style="width:${clamp(S.xp/(S.level*100)*100,0,100)}%"></i>
+                </div>
+                <p>Lên cấp cộng 4 HP, tối đa thêm 60 HP.</p>
+            </div>
+        </div>
+        <div class="note" style="margin-top:18px">
+            Tiến trình lưu trên trình duyệt này. Đổi máy, đổi địa chỉ mở file,
+            hoặc xóa dữ liệu trình duyệt có thể làm mất tiến trình.
+        </div>
+        <button class="action red" data-a="resetask">Xóa tiến trình</button>
+    `);
+}
+
+function helpMenu(){
+    show("📖 Hướng Dẫn Bão Thép",`
+        <div class="grid two">
+            <div class="card">
+                <h3>📱 Điện thoại</h3>
+                <p>Giữ và kéo joystick bên trái để di chuyển.</p>
+                <p>Giữ nút <b>BẮN</b> để bắn liên tục.
+                Mặc định xe tự ngắm đối thủ gần nhất.</p>
+                <p>Chạm chiến trường chuyển sang ngắm tay.
+                Bấm <b>Ngắm tự động</b> để bật lại.</p>
+            </div>
+            <div class="card">
+                <h3>⌨️ Máy tính</h3>
+                <p><b>WASD / mũi tên:</b> di chuyển.<br>
+                <b>Chuột:</b> ngắm khi ở chế độ ngắm tay.<br>
+                <b>Chuột trái / Space:</b> bắn.<br>
+                <b>1:</b> tăng tốc. <b>2:</b> lá chắn.
+                <b>3
+                :</b> sửa chữa.<br>
+                <b>T:</b> đổi ngắm tự động / ngắm tay.<br>
+                <b>Escape:</b> đóng bảng đang mở.</p>
+            </div>
+
+            <div class="card">
+                <h3>🛡️ Kỹ năng</h3>
+                <p>
+                    <b>Tăng tốc:</b> tăng tốc độ trong 2,4 giây,
+                    hồi chiêu 12 giây.<br>
+                    <b>Lá chắn:</b> giảm 65% sát thương trong 4 giây,
+                    hồi chiêu 18 giây.<br>
+                    <b>Sửa chữa:</b> hồi 45 HP, dùng tối đa 2 lần/trận,
+                    hồi chiêu 25 giây.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>💥 Chiến trường</h3>
+                <p>
+                    Tường đá chặn đường đi và đạn.
+                    Thùng gỗ có thể phá hủy.
+                    Nước chặn xe nhưng không chặn đạn.
+                </p>
+                <p>
+                    Thu nhặt hộp tiếp tế để hồi máu, tăng hỏa lực
+                    hoặc nhận lá chắn.
+                </p>
+                <p>Không có sát thương đồng đội.</p>
+            </div>
+
+            <div class="card">
+                <h3>⚔️ Đấu đội</h3>
+                <p>
+                    Mỗi xe đối phương bị hạ đem lại 1 điểm.
+                    Đội đạt 10 điểm trước thắng.
+                    Hết giờ thì so điểm hai đội.
+                </p>
+                <p>Xe bị hạ hồi sinh sau 4 giây.</p>
+            </div>
+
+            <div class="card">
+                <h3>🤖 Boss Cự Pháo</h3>
+                <p>
+                    Bạn và một bot đồng đội đánh Boss.
+                    Bạn có 3 mạng, Boss không hồi sinh.
+                </p>
+                <p>
+                    Boss có đạn nổ và đợt bắn tỏa tròn.
+                    Dùng vật cản, lá chắn và di chuyển liên tục.
+                </p>
+                <p class="muted">
+                    Mở bảng hướng dẫn hoặc chuyển tab sẽ tạm dừng trận.
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <button class="action" data-a="play-training">
+                Vào luyện tập miễn phí
+            </button>
+        </div>
+    `);
+}
+
+function bossMenu(){
+    show("🤖 Phụ Bản Boss Cự Pháo",`
+        <div class="card" style="text-align:center">
+            <div class="icon">🤖</div>
+            <h3>Pháo Đài Di Động</h3>
+            <p>
+                Boss 1.600 HP, đạn nổ và đợt bắn tỏa tròn.
+                Bạn có một bot đồng đội, 3 mạng và 150 giây.
+            </p>
+            <p class="price">
+                Thắng: 400 vàng + 8 kim cương + 150 XP
+            </p>
+            <div class="row" style="justify-content:center">
+                <button class="action" data-a="play-boss">
+                    Xuất kích • 8 ⚡
+                </button>
+                <button class="action blue" data-a="shop">
+                    Nâng cấp trước
+                </button>
+            </div>
+        </div>
+    `);
+}
+
+/* =================== HÀNH ĐỘNG GIAO DIỆN =================== */
+
+function doAction(action,id=""){
+    if(action.startsWith("play-")){
+        startBattle(action.slice(5));
+        return;
+    }
+
+    switch(action){
+        case "close":
+            close();
+            break;
+
+        case "battle":
+        case "duel":
+            battleMenu();
+            break;
+
+        case "boss":
+            bossMenu();
+            break;
+
+        case "tanks":
+            tankMenu();
+            break;
+
+        case "shop":
+            shopMenu();
+            break;
+
+        case "quests":
+            questMenu();
+            break;
+
+        case "daily":
+            dailyMenu();
+            break;
+
+        case "activity":
+            activityMenu();
+            break;
+
+        case "records":
+            recordsMenu();
+            break;
+
+        case "guild":
+            guildMenu();
+            break;
+
+        case "profile":
+            profileMenu();
+            break;
+
+        case "help":
+            helpMenu();
+            break;
+
+        case "hub":
+            returnLobby();
+            break;
+
+        case "leave":
+            if(!B||B.finished)return;
+            show("Rời Chiến Trường?",`
+                <div class="card">
+                    <h3>Trận hiện tại sẽ bị bỏ dở</h3>
+                    <p>
+                        Không nhận thưởng hoặc thành tích.
+                        Năng lượng đã dùng không được hoàn lại.
+                    </p>
+                    <div class="row">
+                        <button class="action red" data-a="hub">
+                            Rời trận
+                        </button>
+                        <button class="action blue" data-a="close">
+                            Tiếp tục
+                        </button>
+                    </div>
+                </div>
+            `);
+            break;
+
+        case "sound":
+            S.sound=!S.sound;
+            save();
+            if(S.sound)sound();
+            break;
+
+        case "fullscreen":{
+            const enter=$("stage").requestFullscreen
+                ||$("stage").webkitRequestFullscreen;
+            const exit=document.exitFullscreen
+                ||document.webkitExitFullscreen;
+
+            try{
+                let result;
+                if(document.fullscreenElement
+                    ||document.webkitFullscreenElement){
+                    if(exit)result=exit.call(document);
+                }else{
+                    if(enter)result=enter.call($("stage"));
+                    else toast("Trình duyệt này không hỗ trợ toàn màn hình.");
+                }
+
+                if(result&&typeof result.catch==="function"){
+                    result.catch(()=>toast("Không bật được toàn màn hình."));
+                }
+            }catch(e){
+                toast("Không bật được toàn màn hình.");
+            }
+            break;
+        }
+
+        case "tank":{
+            const t=TANKS.find(t=>t.id===id);
+            if(!t)return;
+
+            if(!S.owned.includes(id)){
+                if(S.gold<t.cost){
+                    toast("Chưa đủ vàng để mở khóa xe này.");
+                    return;
+                }
+                S.gold-=t.cost;
+                S.owned.push(id);
+                log(`Đã mở khóa ${t.name}.`,true);
+            }
+
+            S.tank=id;
+            save();
+            tankMenu();
+            toast(`Đã trang bị ${t.name}.`);
+            break;
+        }
+
+        case "upgrade":{
+            const id=S.tank;
+            const level=S.upgrades[id];
+
+            if(level>=5)return;
+
+            const cost=230*(level+1);
+
+            if(S.gold<cost){
+                toast(`Cần ${money(cost)} vàng để nâng cấp.`);
+                return;
+            }
+
+            S.gold-=cost;
+            S.upgrades[id]++;
+            S.stats.upgrades++;
+
+            save();
+            shopMenu();
+            sound("win");
+
+            toast(`Nâng cấp thành công! Xe +${S.upgrades[id]}.`);
+            log(`Đã nâng cấp ${TANKS.find(t=>t.id===id).name}.`,true);
+            break;
+        }
+
+        case "energybuy":
+            if(S.energy>=200){
+                toast("Năng lượng đã đầy.");
+                return;
+            }
+            if(S.gems<5){
+                toast("Cần 5 kim cương.");
+                return;
+            }
+
+            S.gems-=5;
+            S.energy=Math.min(200,S.energy+50);
+            save();
+            shopMenu();
+            toast("Đã tiếp tế năng lượng.");
+            break;
+
+        case "claim":{
+            const q=QUESTS.find(q=>q.id===id);
+            if(!q||S.claimed.includes(id)
+                ||S.stats[q.stat]<q.need)return;
+
+            S.claimed.push(id);
+            S.gold+=q.gold;
+            S.gems+=q.gems;
+            save();
+            questMenu();
+            sound("win");
+            toast(`Nhận ${q.gold} vàng + ${q.gems} kim cương.`);
+            log(`Hoàn thành nhiệm vụ: ${q.name}.`,true);
+            break;
+        }
+
+        case "dailyclaim":
+            if(S.daily===day())return;
+            S.daily=day();
+            S.gold+=200;
+            S.gems+=3;
+            S.energy=Math.min(200,S.energy+25);
+            save();
+            dailyMenu();
+            sound("win");
+            toast("Đã nhận quà đăng nhập.");
+            log("Nhận tiếp tế ngày: 200 vàng, 3 kim cương, 25 năng lượng.",true);
+            break;
+
+        case "activityclaim":
+            if(S.activity===day())return;
+            if(S.energy>=200){
+                toast("Năng lượng đang đầy. Bạn có thể nhận sau.");
+                return;
+            }
+            S.activity=day();
+            S.energy=Math.min(200,S.energy+30);
+            save();
+            activityMenu();
+            toast("Đã nhận 30 năng lượng.");
+            break;
+
+        case "rename":{
+            const field=$("rename");
+            if(!field)return;
+            const name=field.value.trim().slice(0,18);
+
+            if(!name){
+                toast("Vui lòng nhập tên nhân vật.");
+                return;
+            }
+
+            S.name=name;
+            save();
+            profileMenu();
+            toast("Đã đổi tên chỉ huy.");
+            break;
+        }
+
+        case "resetask":
+            show("⚠️ Xóa Tiến Trình",`
+                <div class="card">
+                    <h3>Thao tác không thể hoàn tác</h3>
+                    <p>
+                        Vàng, kim cương, xe, nâng cấp và thành tích
+                        sẽ trở về ban đầu.
+                    </p>
+                    <div class="row">
+                        <button class="action red" data-a="resetconfirm">
+                            Xác nhận xóa
+                        </button>
+                        <button class="action blue" data-a="profile">
+                            Giữ tiến trình
+                        </button>
+                    </div>
+                </div>
+            `);
+            break;
+
+        case "resetconfirm":
+            S=initialSave();
+            returnLobby();
+            save();
+            log("Đã tạo tiến trình mới.");
+            toast("Đã đặt lại tiến trình.");
+            break;
+
+        case "aim":
+            if(!B||B.finished)return;
+            input.auto=!input.auto;
+            toast(input.auto
+                ?"Đã bật ngắm tự động."
+                :"Ngắm tay: chạm chiến trường hoặc di chuyển chuột.");
+            updateBattleUI();
+            break;
+
+        case "dash":
+        case "shield":
+        case "repair":
+            useSkill(action);
+            break;
+    }
+}
+
+document.addEventListener("click",event=>{
+    const button=event.target.closest("button[data-a]");
+    if(!button||button.disabled)return;
+
+    const action=button.dataset.a;
+    if(action!=="sound")sound("click");
+    doAction(action,button.dataset.id||"");
+});
+
+function sendNote(){
+    const field=$("chatInput");
+    const note=field.value.trim();
+
+    if(!note)return;
+
+    log(`Ghi chú: ${note}`);
+    field.value="";
+}
+
+$("chatSend").addEventListener("click",sendNote);
+
+$("chatInput").addEventListener("keydown",event=>{
+    if(event.key==="Enter")sendNote();
+});
+
+/* =================== BẢN ĐỒ CHIẾN ĐẤU =================== */
+
+let nextTankID=1;
+
+function obstacle(x,y,w,h,type="stone"){
+    return{
+        x,y,w,h,type,
+        hp:type==="crate"?85:Infinity,
+        maxHP:type==="crate"?85:Infinity,
+        alive:true
+    };
+}
+
+function buildMap(mode){
+    const obstacles=[];
+    const boss=mode==="boss";
+
+    // Các khối đá tạo đường đi vòng, không kín hoàn toàn.
+    const stoneLayout=boss?[
+        [470,250,150,65],
+        [470,815,150,65],
+        [840,355,70,135],
+        [840,700,70,130],
+        [1380,230,155,65],
+        [1380,850,155,65]
+    ]:[
+        [420,240,140,65],
+        [420,845,140,65],
+        [665,420,70,150],
+        [665,710,70,145],
+        [1015,285,70,145],
+        [1015,580,70,145],
+        [1250,240,140,65],
+        [1250,845,140,65],
+        [870,520,120,65]
+    ];
+
+    stoneLayout.forEach(r=>obstacles.push(obstacle(...r,"stone")));
+
+    // Hồ nước: xe không đi qua, đạn có thể bay qua.
+    const waterLayout=boss?[
+        [690,140,180,100],
+        [1040,900,190,105]
+    ]:[
+        [740,130,200,100],
+        [820,925,200,100]
+    ];
+
+    waterLayout.forEach(r=>obstacles.push(obstacle(...r,"water")));
+
+    const crates=[
+        [335,420],[335,650],[540,530],[540,650],
+        [750,305],[790,800],[990,380],[1120,780],
+        [1190,525],[1380,420],[1380,650],[1500,530],
+        [585,170],[1160,930],[900,740],[1090,190]
+    ];
+
+    crates.forEach(([x,y])=>{
+        if(boss&&x>1150&&y>330&&y<760)return;
+        obstacles.push(obstacle(x,y,43,43,"crate"));
+    });
+
+    return obstacles;
+}
+
+function buildGroundTexture(){
+    const c=document.createElement("canvas");
+    c.width=MW;c.height=MH;
+    const g=c.getContext("2d");
+
+    const bg=g.createLinearGradient(0,0,MW,MH);
+    bg.addColorStop(0,"#83bf77");
+    bg.addColorStop(.5,"#a8d98c");
+    bg.addColorStop(1,"#76b875");
+    g.fillStyle=bg;g.fillRect(0,0,MW,MH);
+
+    // Đường lát.
+    g.lineCap="round";
+
+    const roads=[
+        [[135,575],[1660,575]],
+        [[330,190],[1420,970]],
+        [[380,960],[1430,190]]
+    ];
+
+    for(const [a,b] of roads){
+        g.beginPath();g.moveTo(...a);g.lineTo(...b);
+        g.strokeStyle="#c6cc94";g.lineWidth=145;g.stroke();
+        g.strokeStyle="#dad5a5";g.lineWidth=119;g.stroke();
+    }
+
+    // Đốm nền và cỏ.
+    for(let i=0;i<900;i++){
+        const x=rand(20,MW-20),y=rand(20,MH-20);
+        g.globalAlpha=rand(.07,.19);
+        g.fillStyle=i%2?"#f4f5bc":"#316e4c";
+        g.beginPath();
+        g.ellipse(x,y,rand(3,18),rand(2,10),0,0,Math.PI*2);
+        g.fill();
+    }
+
+    g.globalAlpha=1;
+
+    for(let i=0;i<360;i++){
+        const x=rand(15,MW-15),y=rand(15,MH-15);
+        g.strokeStyle=i%2?"#6ba666":"#8fb867";
+        g.lineWidth=1.5;
+        g.beginPath();
+        g.moveTo(x,y);g.lineTo(x-3,y-5);
+        g.moveTo(x,y);g.lineTo(x+3,y-7);
+        g.stroke();
+    }
+
+    // Các vòng xuất phát.
+    for(const [x,color] of [[180,"#5ba8c6"],[1620,"#d79578"]]){
+        g.strokeStyle=color;
+        g.lineWidth=4;
+        g.beginPath();g.arc(x,575,100,0,Math.PI*2);g.stroke();
+
+        g.globalAlpha=.15;
+        g.fillStyle=color;g.fill();
+        g.globalAlpha=1;
+    }
+
+    // Viền bản đồ.
+    g.strokeStyle="#527d61";g.lineWidth=30;
+    g.strokeRect(0,0,MW,MH);
+    g.strokeStyle="#c9e6ad";g.lineWidth=5;
+    g.strokeRect(17,17,MW-34,MH-34);
+
+    return c;
+}
+
+/* =================== VA CHẠM VÀ TÌM ĐƯỜNG =================== */
+
+function circleRect(x,y,r,o){
+    const nx=clamp(x,o.x,o.x+o.w);
+    const ny=clamp(y,o.y,o.y+o.h);
+    return Math.hypot(x-nx,y-ny)<r;
+}
+
+function blocked(x,y,r=23){
+    if(x<r+19||y<r+19||x>MW-r-19||y>MH-r-19)
+        return true;
+
+    return B.obstacles.some(o=>
+        o.alive&&circleRect(x,y,r,o)
+    );
+}
+
+function segmentRect(x1,y1,x2,y2,o,pad=0){
+    let near=0,far=1;
+    const dx=x2-x1,dy=y2-y1;
+
+    for(const [origin,delta,min,max] of [
+        [x1,dx,o.x-pad,o.x+o.w+pad],
+        [y1,dy,o.y-pad,o.y+o.h+pad]
+    ]){
+        if(Math.abs(delta)<.000001){
+            if(origin<min||origin>max)return null;
+            continue;
+        }
+
+        let a=(min-origin)/delta;
+        let b=(max-origin)/delta;
+
+        if(a>b)[a,b]=[b,a];
+
+        near=Math.max(near,a);
+        far=Math.min(far,b);
+
+        if(near>far)return null;
+    }
+
+    return near;
+}
+
+function segmentCircle(x1,y1,x2,y2,cx,cy,r){
+    const dx=x2-x1,dy=y2-y1;
+    const ox=x1-cx,oy=y1-cy;
+    const a=dx*dx+dy*dy;
+    const c=ox*ox+oy*oy-r*r;
+
+    if(c<=0)return 0;
+    if(a<.000001)return null;
+
+    const b=2*(ox*dx+oy*dy);
+    const discriminant=b*b-4*a*c;
+
+    if(discriminant<0)return null;
+
+    const t=(-b-Math.sqrt(discriminant))/(2*a);
+    return t>=0&&t<=1?t:null;
+}
+
+function lineClear(a,b){
+    return !B.obstacles.some(o=>
+        o.alive&&o.type!=="water"
+        &&segmentRect(a.x,a.y,b.x,b.y,o,3)!==null
+    );
+}
+
+const CELL=75;
+const NC=Math.ceil(MW/CELL);
+const NR=Math.ceil(MH/CELL);
+
+function rebuildNavigation(){
+    B.nav=new Uint8Array(NC*NR);
+
+    for(let row=0;row<NR;row++){
+        for(let col=0;col<NC;col++){
+            const x=col*CELL+CELL/2;
+            const y=row*CELL+CELL/2;
+            B.nav[row*NC+col]=blocked(x,y,26)?1:0;
+        }
+    }
+}
+
+function nearestFreeCell(x,y){
+    const col=clamp(Math.floor(x/CELL),0,NC-1);
+    const row=clamp(Math.floor(y/CELL),0,NR-1);
+    const start=row*NC+col;
+
+    if(!B.nav[start])return start;
+
+    let best=-1,score=Infinity;
+
+    for(let r=Math.max(0,row-3);r<=Math.min(NR-1,row+3);r++){
+        for(let c=Math.max(0,col-3);c<=Math.min(NC-1,col+3);c++){
+            const index=r*NC+c;
+            if(B.nav[index])continue;
+
+            const d=(c-col)*(c-col)+(r-row)*(r-row);
+            if(d<score){score=d;best=index}
+        }
+    }
+
+    return best;
+}
+
+function findPath(start,target){
+    const from=nearestFreeCell(start.x,start.y);
+    const to=nearestFreeCell(target.x,target.y);
+
+    if(from<0||to<0||from===to)return [];
+
+    const parent=new Int32Array(NC*NR);
+    parent.fill(-1);
+
+    const queue=[from];
+    parent[from]=from;
+
+    for(let head=0;head<queue.length;head++){
+        const current=queue[head];
+        if(current===to)break;
+
+        const c=current%NC;
+        const r=Math.floor(current/NC);
+
+        for(const [dc,dr] of [[1,0],[-1,0],[0,1],[0,-1]]){
+            const cc=c+dc,rr=r+dr;
+
+            if(cc<0||rr<0||cc>=NC||rr>=NR)continue;
+
+            const next=rr*NC+cc;
+            if(B.nav[next]||parent[next]!==-1)continue;
+
+            parent[next]=current;
+            queue.push(next);
+        }
+    }
+
+    if(parent[to]===-1)return [];
+
+    const result=[];
+    let current=to;
+
+    while(current!==from){
+        result.push({
+            x:(current%NC)*CELL+CELL/2,
+            y:Math.floor(current/NC)*CELL+CELL/2
+        });
+        current=parent[current];
+    }
+
+    result.reverse();
+    return result;
+}
+
+function moveTank(t,dx,dy,dt){
+    const length=Math.hypot(dx,dy);
+    if(length<.001){t.vx=0;t.vy=0;return}
+
+    dx/=Math.max(1,length);
+    dy/=Math.max(1,length);
+
+    const speed=t.speed*(t.dashTime>0?1.75:1);
+    const oldX=t.x,oldY=t.y;
+
+    const newX=clamp(t.x+dx*speed*dt,t.r+20,MW-t.r-20);
+    const newY=clamp(t.y+dy*speed*dt,t.r+20,MH-t.r-20);
+
+    if(!blocked(newX,t.y,t.r))t.x=newX;
+    if(!blocked(t.x,newY,t.r))t.y=newY;
+
+    t.vx=(t.x-oldX)/dt;
+    t.vy=(t.y-oldY)/dt;
+
+    const moved=Math.hypot(t.x-oldX,t.y-oldY);
+
+    if(moved>.01){
+        t.body=lerpAngle(t.body,Math.atan2(dy,dx),dt*10);
+        t.track+=moved;
+    }
+
+    return moved;
+}
+
+/* =================== KHỞI TẠO XE VÀ TRẬN =================== */
+
+function makeTank(def,team,x,y,name,player=false,boss=false){
+    const upgrade=player?S.upgrades[def.id]:0;
+    const levelBonus=player?Math.min(S.level-1,15)*4:0;
+
+    let hp=def.hp+upgrade*10+levelBonus;
+    let damage=def.damage+upgrade*3;
+
+    if(!player&&team===1&&B.mode==="hard"){
+        hp=Math.round(hp*1.18);
+        damage=Math.round(damage*1.14);
+    }
+
+    return{
+        id:nextTankID++,
+        definition:def.id,
+        name,team,player,boss,
+        x,y,spawnX:x,spawnY:y,
+        r:boss?43:23,
+        hp,maxHP:hp,
+        color:def.color,
+        speed:def.speed,
+        damage,
+        rate:def.rate,
+        bulletSpeed:def.bulletSpeed,
+        blast:def.blast,
+        pellets:def.pellets||1,
+        alive:true,respawn:0,
+        vx:0,vy:0,
+        body:team===0?0:Math.PI,
+        turret:team===0?0:Math.PI,
+        track:0,shotCD:rand(0,.3),
+        hurt:0,spawnShield:1.5,
+        dashTime:0,dashCD:0,
+        shieldTime:0,shieldCD:0,
+        repairCD:0,repairCharges:2,
+        powerTime:0,
+        path:[],pathCD:rand(0,.4),
+        target:null,
+        strafe:Math.random()>.5?1:-1,
+        stuck:0,
+        burstCD:boss?5.5:0
+    };
+}
+
+function startBattle(mode){
+    if(!["normal","hard","boss","training"].includes(mode))return;
+
+    regen();
+
+    if(mode!=="training"&&S.energy<8){
+        toast("Không đủ năng lượng. Nhận quà ngày hoặc luyện tập miễn phí.",4);
+        return;
+    }
+
+    if(mode!=="training"){
+        S.energy-=8;
+        save();
+    }
+
+    close(false);
+    clearInput();
+    scene="battle";
+    input.auto=true;
+
+    B={
+        mode,
+        timer:mode==="boss"?150:mode==="training"?150:180,
+        score:[0,0],
+        goal:mode==="training"?6:10,
+        lives:3,
+        player:null,tanks:[],
+        obstacles:buildMap(mode),
+        bullets:[],particles:[],rings:[],labels:[],
+        pickups:[],
+        pickupClock:4,
+        camera:{x:0,y:0},
+        ground:buildGroundTexture(),
+        kills:0,damage:0,
+        finished:false,
+        shake:0,
+        elapsed:0,
+        nav:null
+    };
+
+    const selected=TANKS.find(t=>t.id===S.tank);
+    const p=makeTank(selected,0,180,575,S.name,true);
+    B.player=p;
+    B.tanks.push(p);
+
+    if(mode==="boss"){
+        B.tanks.push(makeTank(
+            TANKS[2],0,225,720,"Đồng Đội Thiết Giáp"
+        ));
+
+        const bossDef={
+            id:"boss",color:"#9da2ac",hp:1600,
+            speed:89,damage:31,rate:1.05,
+            bulletSpeed:390,blast:57,pellets:3
+        };
+
+        B.tanks.push(makeTank(
+            bossDef,1,1430,575,"BOSS CỰ PHÁO",false,true
+        ));
+    }else{
+        if(mode!=="training"){
+            B.tanks.push(makeTank(TANKS[1],0,180,415,"Đồng Đội Tia Chớp"));
+            B.tanks.push(makeTank(TANKS[2],0,180,735,"Đồng Đội Thiết Giáp"));
+        }
+
+        const enemies=mode==="training"?2:3;
+
+        for(let i=0;i<enemies;i++){
+            const def=mode==="training"
+                ?TANKS[0]
+                :TANKS[[0,3,1][i]];
+
+            const enemy=makeTank(
+                def,1,1620,415+i*160,
+                mode==="training"
+                    ?`Bot Luyện Tập ${i+1}`
+                    :`Đội Đỏ ${i+1}`
+            );
+
+            if(mode==="training"){
+                enemy.damage=11;
+                enemy.rate=.7;
+                enemy.speed=135;
+                enemy.maxHP=enemy.hp=120;
+            }
+
+            B.tanks.push(enemy);
+        }
+    }
+
+    rebuildNavigation();
+
+    for(const [x,y,type] of [
+        [600,345,"heal"],
+        [1170,870,"power"],
+        [890,630,"shield"]
+    ]){
+        if(!blocked(x,y,18)){
+            B.pickups.push({x,y,type,life:35,bob:rand(0,6)});
+        }
+    }
+
+    B.camera.x=clamp(p.x-W/2,0,MW-W);
+    B.camera.y=clamp(p.y-H/2,0,MH-H);
+
+    $("lobbyUI").style.display="none";
+    $("battleUI").style.display="block";
+
+    updateBattleUI();
+
+    log(`Xuất kích: ${
+        mode==="boss"?"Boss Cự Pháo":
+        mode==="hard"?"Giải đấu cao thủ":
+        mode==="training"?"Luyện tập":"Đấu đội 3v3"
+    }.`);
+
+    toast(
+        mode==="boss"
+            ?"Boss xuất hiện! Bạn có 3 mạng. Giữ BẮN và dùng kỹ năng để sinh tồn."
+            :"Giữ BẮN để khai hỏa. WASD hoặc joystick để di chuyển.",
+        4
+    );
+}
+
+function returnLobby(){
+    close(false);
+    clearInput();
+    scene="lobby";
+    B=null;
+    hover=null;
+
+    $("lobbyUI").style.display="block";
+    $("battleUI").style.display="none";
+
+    save();
+}
+
+function canControl(){
+    return scene==="battle"&&B&&!B.finished&&!modal
+        &&B.player.alive;
+}
+
+function useSkill(skill){
+    if(!canControl())return;
+
+    const p=B.player;
+
+    if(skill==="dash"){
+        if(p.dashCD>0)return;
+
+        p.dashTime=2.4;
+        p.dashCD=12;
+        toast("Tăng tốc đã kích hoạt!",1.4);
+    }
+
+    if(skill==="shield"){
+        if(p.shieldCD>0)return;
+
+        p.shieldTime=4;
+        p.shieldCD=18;
+        toast("Lá chắn giảm 65% sát thương.",1.6);
+    }
+
+    if(skill==="repair"){
+        if(p.repairCD>0||p.repairCharges<=0)return;
+
+        if(p.hp>=p.maxHP){
+            toast("Xe đang đầy máu.");
+            return;
+        }
+
+        const heal=Math.min(45,p.maxHP-p.hp);
+        p.hp+=heal;
+        p.repairCharges--;
+        p.repairCD=25;
+
+        floatText(p.x,p.y-44,`+${heal} HP`,"#c5ffb7");
+        particles(p.x,p.y,"#a1f3ad",20);
+        sound("heal");
+    }
+
+    updateBattleUI();
+}
+
+/* =================== AI =================== */
+
+function nearestEnemy(t,preferVisible=false){
+    let best=null,bestScore=Infinity;
+
+    for(const other of B.tanks){
+        if(!other.alive||other.team===t.team)continue;
+
+        let score=distance(t,other);
+
+        if(preferVisible&&!lineClear(t,other))score+=440;
+
+        if(score<bestScore){
+            best=other;
+            bestScore=score;
+        }
+    }
+
+    return best;
+}
+
+function aimTank(t,target,dt,accuracy=1){
+    const dist=distance(t,target);
+    const travel=Math.min(.65,dist/t.bulletSpeed);
+
+    const tx=target.x+target.vx*travel*accuracy;
+    const ty=target.y+target.vy*travel*accuracy;
+
+    const angle=Math.atan2(ty-t.y,tx-t.x);
+
+    t.turret=lerpAngle(t.turret,angle,dt*(t.boss?4:12));
+
+    return Math.abs(Math.atan2(
+        Math.sin(angle-t.turret),
+        Math.cos(angle-t.turret)
+    ));
+}
+
+function updateBot(t,dt){
+    if(!t.alive)return;
+
+    let target=t.target;
+
+    if(!target||!target.alive||target.team===t.team){
+        target=nearestEnemy(t);
+        t.target=target;
+    }
+
+    // Thỉnh thoảng chọn lại để phản ứng với đối thủ đang áp sát.
+    t.pathCD-=dt;
+
+    if(t.pathCD<=0){
+        target=nearestEnemy(t,true);
+        t.target=target;
+        t.pathCD=.7+rand(0,.25);
+
+        if(target&&!lineClear(t,target)){
+            t.path=findPath(t,target);
+        }else{
+            t.path=[];
+        }
+    }
+
+    if(!target)return;
+
+    const d=distance(t,target);
+    const visible=lineClear(t,target);
+
+    let mx=0,my=0;
+
+    if(!visible&&t.path.length){
+        const waypoint=t.path[0];
+
+        if(Math.hypot(waypoint.x-t.x,waypoint.y-t.y)<23){
+            t.path.shift();
+        }
+
+        if(t.path.length){
+            mx=t.path[0].x-t.x;
+            my=t.path[0].y-t.y;
+        }
+    }else{
+        const dx=(target.x-t.x)/Math.max(1,d);
+        const dy=(target.y-t.y)/Math.max(1,d);
+
+        if(t.boss){
+            if(d>360){mx=dx;my=dy}
+            else if(d<180){mx=-dx;my=-dy}
+        }else if(d>370){
+            mx=dx;my=dy;
+        }else if(d<180){
+            mx=-dx;my=-dy;
+        }else{
+            // Di chuyển ngang để tránh đạn.
+            mx=-dy*t.strafe*.7;
+            my=dx*t.strafe*.7;
+        }
+    }
+
+    // Tách xe khỏi đồng đội đứng quá gần.
+    for(const other of B.tanks){
+        if(other===t||!other.alive)continue;
+
+        const gap=distance(t,other);
+
+        if(gap<70&&gap>1){
+            mx+=(t.x-other.x)/gap*.7;
+            my+=(t.y-other.y)/gap*.7;
+        }
+    }
+
+    const moved=moveTank(t,mx,my,dt)||0;
+
+    if(Math.hypot(mx,my)>.1&&moved<.15){
+        t.stuck+=dt;
+
+        if(t.stuck>.35){
+            t.strafe*=-1;
+
+            // Thử lách vuông góc khi góc tường chặn xe.
+            moveTank(t,-my*t.strafe,mx*t.strafe,dt);
+        }
+
+        if(t.stuck>1.2){
+            t.path=findPath(t,target);
+            t.pathCD=.8;
+            t.stuck=0;
+        }
+    }else{
+        t.stuck=Math.max(0,t.stuck-dt*2);
+    }
+
+    const precision=B.mode==="hard"?1:
+        B.mode==="training"?.2:.65;
+
+    const aimError=aimTank(t,target,dt,precision);
+
+    if(
+        visible&&d<660&&aimError<(t.boss?.35:.18)
+        &&t.shotCD<=0
+    ){
+        const spread=B.mode==="training"?.16:
+            B.mode==="hard"?.025:.065;
+
+        shoot(t,t.turret+rand(-spread,spread));
+    }
+
+    if(t.boss){
+        t.burstCD-=dt;
+
+        if(t.burstCD<=0){
+            t.burstCD=6.7;
+
+            for(let i=0;i<10;i++){
+                createBullet(
+                    t,
+                    i*Math.PI*2/10+time*.15,
+                    .72,
+                    0
+                );
+            }
+
+            particles(t.x,t.y,"#ffc988",34);
+            floatText(t.x,t.y-78,"ĐẠN TỎA TRÒN!","#ffe49b");
+            sound("boom");
+        }
+    }
+}
+
+/* =================== ĐẠN VÀ SÁT THƯƠNG =================== */
+
+function createBullet(t,angle,multiplier=1,spread=0){
+    const a=angle+spread;
+    const muzzle=t.r+(t.boss?25:19);
+
+    B.bullets.push({
+        x:t.x+Math.cos(a)*muzzle,
+        y:t.y+Math.sin(a)*muzzle,
+        vx:Math.cos(a)*t.bulletSpeed,
+        vy:Math.sin(a)*t.bulletSpeed,
+        team:t.team,owner:t.id,
+        damage:t.damage*multiplier*(t.powerTime>0?1.3:1),
+        blast:t.blast,
+        life:t.boss?3.2:2.4,
+        color:t.definition==="plasma"
+            ?"#b7b0ff"
+            :t.team===0?"#fff1a1":"#ffc197",
+        r:t.boss?6:t.definition==="plasma"?5:4,
+        alive:true
+    });
+}
+
+function shoot(t,angle=t.turret){
+    if(!t.alive||t.shotCD>0||B.finished)return;
+
+    t.shotCD=t.rate;
+
+    if(t.pellets>1){
+        for(let i=0;i<t.pellets;i++){
+            const spread=(i-(t.pellets-1)/2)*.18;
+            createBullet(t,angle,1,spread);
+        }
+    }else{
+        createBullet(t,angle);
+    }
+
+    const muzzle=t.r+15;
+    particles(
+        t.x+Math.cos(angle)*muzzle,
+        t.y+Math.sin(angle)*muzzle,
+        "#ffe4a0",
+        4,
+        65
+    );
+
+    if(t.player)sound("shot");
+}
+
+function floatText(x,y,text,color="#fff0a1"){
+    if(!B)return;
+    B.labels.push({x,y,text:String(text),color,life:1.15});
+}
+
+function particles(x,y,color,count=18,speed=160){
+    if(!B)return;
+
+    for(let i=0;i<count;i++){
+        const a=rand(0,Math.PI*2);
+        const v=rand(speed*.2,speed);
+
+        B.particles.push({
+            x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,
+            life:rand(.2,.75),size:rand(2,6),color
+        });
+    }
+
+    if(B.particles.length>450){
+        B.particles.splice(0,B.particles.length-450);
+    }
+}
+
+function ownerTank(id){
+    return B.tanks.find(t=>t.id===id)||null;
+}
+
+function damageTank(t,amount,ownerID){
+    if(!t.alive||t.spawnShield>0)return 0;
+
+    if(t.shieldTime>0)amount*=.35;
+
+    const actual=Math.min(
+        t.hp,
+        Math.max(1,Math.round(amount))
+    );
+
+    t.hp-=actual;
+    t.hurt=.14;
+
+    const owner=ownerTank(ownerID);
+
+    if(owner&&owner.player){
+        B.damage+=actual;
+    }
+
+    floatText(t.x,t.y-t.r-18,`-${actual}`,
+        t.team===0?"#ffc5a5":"#fff0a7");
+
+    if(t.hp<=0){
+        killTank(t,owner);
+    }else if(t.player){
+        B.shake=Math.max(B.shake,3);
+        sound("hit");
+    }
+
+    return actual;
+}
+
+function killTank(t,owner){
+    if(!t.alive)return;
+
+    t.hp=0;
+    t.alive=false;
+    t.vx=0;t.vy=0;
+    t.respawn=t.boss?Infinity:B.mode==="boss"?5:4;
+
+    particles(t.x,t.y,"#f3c179",40,230);
+    particles(t.x,t.y,"#879195",22,150);
+
+    B.rings.push({
+        x:t.x,y:t.y,r:t.boss?115:55,
+        life:.6,max:.6,color:"#ffc16e"
+    });
+
+    if(owner&&owner.team!==t.team){
+        B.score[owner.team]++;
+
+        if(owner.player){
+            B.kills++;
+            floatText(t.x,t.y-62,"HẠ XE!","#fff5ac");
+        }
+    }
+
+    if(t.player){
+        clearInput();
+
+        if(B.mode==="boss"){
+            B.lives--;
+            toast(B.lives>0
+                ?`Xe bị hạ! Còn ${B.lives} mạng.`
+                :"Bạn đã dùng hết 3 mạng.",2.5);
+        }else{
+            toast("Xe bị hạ! Hồi sinh sau 4 giây.",2);
+        }
+
+        sound("boom");
+    }
+
+    if(!t.boss&&Math.random()<.45){
+        dropPickup(t.x,t.y);
+    }
+}
+
+function damageObstacle(o,damage){
+    if(!o.alive||o.type!=="crate")return;
+
+    o.hp-=damage;
+
+    if(o.hp<=0){
+        o.alive=false;
+        const x=o.x+o.w/2,y=o.y+o.h/2;
+
+        particles(x,y,"#cfa06e",22,150);
+
+        if(Math.random()<.4)dropPickup(x,y);
+
+        rebuildNavigation();
+    }
+}
+
+function impactBullet(b,x,y,target=null,ob=null){
+    b.alive=false;
+
+    if(b.blast>0){
+        B.rings.push({
+            x,y,r:b.blast,life:.38,max:.38,color:"#ffc28a"
+        });
+
+        particles(x,y,"#ffd18e",22,185);
+
+        for(const t of B.tanks){
+            if(!t.alive||t.team===b.team)continue;
+
+            const d=Math.max(0,Math.hypot(t.x-x,t.y-y)-t.r);
+
+            if(t===target||d<b.blast){
+                const multiplier=t===target
+                    ?1
+                    :clamp(1-d/b.blast,.1,1);
+
+                damageTank(t,b.damage*multiplier,b.owner);
+            }
+        }
+
+        for(const obstacle of B.obstacles){
+            if(!obstacle.alive||obstacle.type!=="crate")continue;
+
+            const nx=clamp(x,obstacle.x,obstacle.x+obstacle.w);
+            const ny=clamp(y,obstacle.y,obstacle.y+obstacle.h);
+
+            if(Math.hypot(x-nx,y-ny)<b.blast){
+                damageObstacle(obstacle,b.damage);
+            }
+        }
+
+        const p=B.player;
+
+        if(p.alive&&Math.hypot(p.x-x,p.y-y)<300){
+            B.shake=Math.max(B.shake,5);
+        }
+    }else{
+        particles(x,y,b.color,7,100);
+
+        if(target)damageTank(target,b.damage,b.owner);
+        if(ob)damageObstacle(ob,b.damage);
+    }
+}
+
+function updateBullets(dt){
+    for(const b of B.bullets){
+        if(!b.alive)continue;
+
+        b.life-=dt;
+
+        if(b.life<=0){
+            b.alive=false;
+            continue;
+        }
+
+        const x1=b.x,y1=b.y;
+        const x2=x1+b.vx*dt,y2=y1+b.vy*dt;
+
+        let best=1.01;
+        let hitTank=null,hitObstacle=null;
+
+        for(const o of B.obstacles){
+            if(!o.alive||o.type==="water")continue;
+
+            const fraction=segmentRect(x1,y1,x2,y2,o,b.r);
+
+            if(fraction!==null&&fraction<best){
+                best=fraction;
+                hitObstacle=o;
+                hitTank=null;
+            }
+        }
+
+        for(const t of B.tanks){
+            if(!t.alive||t.team===b.team)continue;
+
+            const fraction=segmentCircle(
+                x1,y1,x2,y2,t.x,t.y,t.r+b.r
+            );
+
+            if(fraction!==null&&fraction<best){
+                best=fraction;
+                hitTank=t;
+                hitObstacle=null;
+            }
+        }
+
+        if(best<=1){
+            b.x=x1+(x2-x1)*best;
+            b.y=y1+(y2-y1)*best;
+            impactBullet(b,b.x,b.y,hitTank,hitObstacle);
+        }else{
+            b.x=x2;b.y=y2;
+
+            if(b.x<16||b.y<16||b.x>MW-16||b.y>MH-16){
+                b.alive=false;
+                particles(
+                    clamp(b.x,16,MW-16),
+                    clamp(b.y,16,MH-16),
+                    b.color,5,80
+                );
+            }
+        }
+    }
+
+    B.bullets=B.bullets.filter(b=>b.alive);
+}
+
+/* =================== TIẾP TẾ VÀ HỒI SINH =================== */
+
+function dropPickup(x,y,type=null){
+    if(!B||B.pickups.length>=9)return;
+
+    if(blocked(x,y,12))return;
+
+    const types=["heal","power","shield"];
+
+    B.pickups.push({
+        x,y,
+        type:type||types[Math.floor(rand(0,types.length))],
+        life:28,bob:rand(0,6)
+    });
+}
+
+function randomPickup(){
+    for(let i=0;i<20;i++){
+        const x=rand(300,MW-300),y=rand(140,MH-140);
+
+        if(!blocked(x,y,24)){
+            dropPickup(x,y);
+            break;
+        }
+    }
+}
+
+function updatePickups(dt){
+    B.pickupClock-=dt;
+
+    if(B.pickupClock<=0){
+        B.pickupClock=8;
+        randomPickup();
+    }
+
+    for(const item of B.pickups){
+        item.life-=dt;
+
+        if(item.life<=0)continue;
+
+        for(const t of B.tanks){
+            if(!t.alive||t.boss||distance(t,item)>t.r+17)continue;
+
+            if(item.type==="heal"){
+                if(t.hp>=t.maxHP)continue;
+
+                const healed=Math.min(38,t.maxHP-t.hp);
+                t.hp+=healed;
+                floatText(t.x,t.y-40,`+${healed} HP`,"#c4ffab");
+            }
+
+            if(item.type==="power"){
+                t.powerTime=8;
+                floatText(t.x,t.y-40,"HỎA LỰC +30%","#ffe392");
+            }
+
+            if(item.type==="shield"){
+                t.shieldTime=Math.max(t.shieldTime,4.5);
+                floatText(t.x,t.y-40,"LÁ CHẮN","#a8efff");
+            }
+
+            item.life=0;
+
+            particles(t.x,t.y,"#c7fff2",15,110);
+            if(t.player)sound("heal");
+            break;
+        }
+    }
+
+    B.pickups=B.pickups.filter(p=>p.life>0);
+}
+
+function respawnTank(t){
+    let spawn={x:t.spawnX,y:t.spawnY};
+
+    for(let i=0;i<16;i++){
+        const candidate={
+            x:clamp(t.spawnX+rand(-75,75),70,MW-70),
+            y:clamp(t.spawnY+rand(-95,95),70,MH-70)
+        };
+
+        if(!blocked(candidate.x,candidate.y,t.r)){
+            spawn=candidate;
+            break;
+        }
+    }
+
+    t.x=spawn.x;t.y=spawn.y;
+    t.hp=t.maxHP;
+    t.alive=true;
+    t.spawnShield=2;
+    t.shotCD=.4;
+    t.shieldTime=0;
+    t.dashTime=0;
+    t.powerTime=0;
+    t.path=[];
+    t.target=null;
+    t.vx=0;t.vy=0;
+    t.body=t.team===0?0:Math.PI;
+    t.turret=t.body;
+
+    particles(t.x,t.y,"#baf3f4",25,100);
+
+    if(t.player)toast("Đã hồi sinh! Lá chắn xuất phát trong 2 giây.",2);
+}
+
+function updateTankTimers(t,dt){
+    for(const key of [
+        "shotCD","hurt","spawnShield",
+        "dashTime","dashCD","shieldTime","shieldCD",
+        "repairCD","powerTime"
+    ]){
+        t[key]=Math.max(0,t[key]-dt);
+    }
+
+    if(!t.alive&&!t.boss){
+        if(t.player&&B.mode==="boss"&&B.lives<=0)return;
+
+        t.respawn-=dt;
+
+        if(t.respawn<=0)respawnTank(t);
+    }
+}
+
+/* =================== KẾT QUẢ VÀ TIẾN TRÌNH =================== */
+
+function addXP(amount){
+    S.xp+=amount;
+    let gained=0;
+
+    while(S.level<999&&S.xp>=S.level*100){
+        S.xp-=S.level*100;
+        S.level++;
+        gained++;
+    }
+
+    return gained;
+}
+
+function checkEnd(){
+    if(!B||B.finished)return;
+
+    if(B.mode==="boss"){
+        const boss=B.tanks.find(t=>t.boss);
+
+        if(!boss.alive){
+            finish("win","Boss Cự Pháo đã bị phá hủy!");
+            return;
+        }
+
+        if(B.lives<=0){
+            finish("lose","Bạn đã dùng hết 3 mạng.");
+            return;
+        }
+
+        if(B.timer<=0){
+            finish("lose","Hết thời gian đánh Boss.");
+        }
+
+        return;
+    }
+
+    if(B.score[0]>=B.goal||B.score[1]>=B.goal||B.timer<=0){
+        const result=B.score[0]===B.score[1]
+            ?"draw"
+            :B.score[0]>B.score[1]?"win":"lose";
+
+        finish(result,B.timer<=0
+            ?"Đã hết thời gian trận đấu."
+            :"Một đội đã đạt mục tiêu điểm.");
+    }
+}
+
+function finish(result,reason){
+    if(!B||B.finished)return;
+
+    B.finished=true;
+    clearInput();
+
+    const training=B.mode==="training";
+    const won=result==="win";
+    const draw=result==="draw";
+
+    let gold=0,gems=0,xp=0;
+
+    if(!training){
+        S.stats.played++;
+        S.stats.kills+=B.kills;
+        S.stats.damage+=Math.floor(B.damage);
+        S.stats.best=Math.max(S.stats.best,B.kills);
+
+        if(won){
+            S.stats.wins++;
+
+            if(B.mode==="boss"){
+                gold=400;gems=8;xp=150;
+                S.stats.boss++;
+            }else if(B.mode==="hard"){
+                gold=280;xp=110;
+            }else{
+                gold=180;xp=75;
+            }
+        }else if(draw){
+            gold=80;xp=30;
+        }else{
+            gold=45;xp=20;
+        }
+
+        S.gold+=gold;
+        S.gems+=gems;
+    }
+
+    const gained=training?0:addXP(xp);
+    const mode=B.mode;
+
+    save();
+
+    const heading=won?"🏆 CHIẾN THẮNG":
+        draw?"🤝 TRẬN HÒA":"💪 THỬ LẠI NHÉ";
+
+    log(`${heading.replace(/^[^\s]+\s/,"")} • ${
+        training?"Luyện tập":
+        `+${gold} vàng, +${xp} XP`
+    }.`,true);
+
+    if(won){
+        sound("win");
+
+        particles(
+            B.player.x,B.player.y,
+            "#ffe397",100,260
+        );
+    }
+
+    show("Kết Quả Chiến Trường",`
+        <h2 style="
+            text-align:center;font-size:38px;
+            color:${won?"#b18329":"#587984"};margin:5px 0 13px">
+            ${heading}
+        </h2>
+
+        <p style="text-align:center">${reason}</p>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Xe tự hạ</h3>
+                <div class="stat">${B.kills}</div>
+            </div>
+            <div class="card">
+                <h3>Sát thương gây ra</h3>
+                <div class="stat">${money(B.damage)}</div>
+            </div>
+            <div class="card">
+                <h3>Điểm hai đội</h3>
+                <div class="stat">${B.score[0]} : ${B.score[1]}</div>
+            </div>
+        </div>
+
+        <div class="note" style="margin-top:17px;text-align:center">
+            ${training
+                ?"Luyện tập không thưởng vàng, XP hoặc tính nhiệm vụ."
+                :`Phần thưởng: <b>${gold} vàng + ${gems} 💎 + ${xp} XP</b>.`}
+            ${gained>0?`<br>✨ Bạn đã lên cấp ${S.level}!`:""}
+        </div>
+
+        <div class="row" style="justify-content:center">
+            <button class="action" data-a="play-${mode}">
+                Chơi lại ${training?"• miễn phí":"• 8 ⚡"}
+            </button>
+            <button class="action blue" data-a="hub">
+                Về đảo
+            </button>
+        </div>
+    `,returnLobby);
+
+    updateBattleUI();
+}
+
+/* =================== ĐIỀU KHIỂN CẢM ỨNG =================== */
+
+function screenPoint(event){
+    const bounds=canvas.getBoundingClientRect();
+
+    return{
+        x:(event.clientX-bounds.left)*W/bounds.width,
+        y:(event.clientY-bounds.top)*H/bounds.height
+    };
+}
+
+function nodeAt(p){
+    let best=null,score=Infinity;
+
+    for(const n of NODES){
+        const centerY=n.y-55;
+        const radiusX=n.type==="dome"?111:90;
+        const radiusY=n.type==="carousel"?127:110;
+
+        const d=Math.pow((p.x-n.x)/radiusX,2)
+            +Math.pow((p.y-centerY)/radiusY,2);
+
+        if(d<1&&d<score){best=n;score=d}
+    }
+
+    return best;
+}
+
+function setManualAim(point){
+    if(!B||B.finished)return;
+
+    input.auto=false;
+    input.screenX=point.x;
+    input.screenY=point.y;
+    input.hasScreenAim=true;
+    input.aimX=point.x+B.camera.x;
+    input.aimY=point.y+B.camera.y;
+}
+
+canvas.addEventListener("pointerdown",event=>{
+    if(modal||event.button!==0||canvasPointer!==null)return;
+
+    const p=screenPoint(event);
+
+    canvasPointer={
+        id:event.pointerId,
+        x:p.x,y:p.y,
+        moved:false,
+        scene
+    };
+
+    canvas.setPointerCapture(event.pointerId);
+    event.preventDefault();
+
+    if(scene==="battle"&&!B.finished){
+        setManualAim(p);
+
+        // Chuột trái vừa ngắm vừa bắn.
+        // Cảm ứng bắn bằng nút riêng để tránh chạm nhầm.
+        if(event.pointerType==="mouse"){
+            input.mouseFire=true;
+            sound("click");
+        }
+    }
+});
+
+canvas.addEventListener("pointermove",event=>{
+    const p=screenPoint(event);
+
+    if(scene==="lobby"&&!modal){
+        const n=nodeAt(p);
+        hover=n?n.id:null;
+        canvas.style.cursor=n?"pointer":"default";
+    }else if(scene==="battle"&&!modal&&B&&!B.finished){
+        canvas.style.cursor="crosshair";
+
+        if(!input.auto||canvasPointer){
+            input.screenX=p.x;
+            input.screenY=p.y;
+            input.hasScreenAim=true;
+            input.aimX=p.x+B.camera.x;
+            input.aimY=p.y+B.camera.y;
+        }
+    }
+
+    if(canvasPointer&&canvasPointer.id===event.pointerId){
+        if(Math.hypot(p.x-canvasPointer.x,p.y-canvasPointer.y)>10){
+            canvasPointer.moved=true;
+        }
+    }
+});
+
+canvas.addEventListener("pointerup",event=>{
+    if(!canvasPointer||canvasPointer.id!==event.pointerId)return;
+
+    const gesture=canvasPointer;
+    const p=screenPoint(event);
+
+    canvasPointer=null;
+    input.mouseFire=false;
+
+    if(canvas.hasPointerCapture(event.pointerId))
+        canvas.releasePointerCapture(event.pointerId);
+
+    if(
+        scene==="lobby"&&gesture.scene===scene
+        &&!gesture.moved&&!modal
+    ){
+        const n=nodeAt(p);
+
+        if(n){
+            sound();
+            doAction(n.id);
+        }
+    }
+});
+
+function cancelCanvas(){
+    canvasPointer=null;
+    input.mouseFire=false;
+}
+
+canvas.addEventListener("pointercancel",cancelCanvas);
+canvas.addEventListener("lostpointercapture",cancelCanvas);
+
+canvas.addEventListener("pointerleave",()=>{
+    hover=null;
+});
+
+// Joystick hỗ trợ giữ một ngón tay, đồng thời ngón khác giữ BẮN.
+function updateJoystick(event){
+    const r=$("joystick").getBoundingClientRect();
+    const cx=r.left+r.width/2;
+    const cy=r.top+r.height/2;
+
+    let x=(event.clientX-cx)/(r.width*.34);
+    let y=(event.clientY-cy)/(r.height*.34);
+
+    const magnitude=Math.hypot(x,y);
+
+    if(magnitude>1){
+        x/=magnitude;y/=magnitude;
+    }
+
+    if(magnitude<.1){
+        x=0;y=0;
+    }
+
+    input.x=x;input.y=y;
+
+    $("stick").style.transform=
+        `translate(${x*35}px,${y*35}px)`;
+}
+
+$("joystick").addEventListener("pointerdown",event=>{
+    if(!canControl()||stickPointer!==null)return;
+
+    event.preventDefault();
+    stickPointer=event.pointerId;
+    $("joystick").setPointerCapture(event.pointerId);
+    updateJoystick(event);
+});
+
+$("joystick").addEventListener("pointermove",event=>{
+    if(stickPointer===event.pointerId){
+        event.preventDefault();
+        updateJoystick(event);
+    }
+});
+
+function releaseJoystick(event){
+    if(event&&stickPointer!==event.pointerId)return;
+
+    stickPointer=null;
+    input.x=0;input.y=0;
+    $("stick").style.transform="";
+}
+
+$("joystick").addEventListener("pointerup",releaseJoystick);
+$("joystick").addEventListener("pointercancel",releaseJoystick);
+$("joystick").addEventListener("lostpointercapture",releaseJoystick);
+
+let firePointer=null;
+
+$("fire").addEventListener("pointerdown",event=>{
+    if(!canControl()||firePointer!==null)return;
+
+    event.preventDefault();
+    firePointer=event.pointerId;
+    $("fire").setPointerCapture(event.pointerId);
+    input.fire=true;
+    sound("click");
+});
+
+function releaseFire(event){
+    if(event&&firePointer!==event.pointerId)return;
+    firePointer=null;
+    input.fire=false;
+}
+
+$("fire").addEventListener("pointerup",releaseFire);
+$("fire").addEventListener("pointercancel",releaseFire);
+$("fire").addEventListener("lostpointercapture",releaseFire);
+
+addEventListener("keydown",event=>{
+    if(event.key==="Escape"){
+        if(modal)close();
+        return;
+    }
+
+    if(
+        event.target instanceof HTMLElement
+        &&["INPUT","TEXTAREA","SELECT"].includes(event.target.tagName)
+    )return;
+
+    if(scene!=="battle"||modal)return;
+
+    const k=event.key.toLowerCase();
+
+    if([
+        "w","a","s","d","arrowleft","arrowright",
+        "arrowup","arrowdown"," ","1","2","3","t"
+    ].includes(k)){
+        event.preventDefault();
+    }
+
+    keys[k]=true;
+
+    if(!event.repeat){
+        if(k==="1")useSkill("dash");
+        if(k==="2")useSkill("shield");
+        if(k==="3")useSkill("repair");
+        if(k==="t")doAction("aim");
+    }
+});
+
+addEventListener("keyup",event=>{
+    delete keys[event.key.toLowerCase()];
+});
+
+addEventListener("blur",()=>{
+    clearInput();
+    firePointer=null;
+});
+
+document.addEventListener("visibilitychange",()=>{
+    clearInput();
+    firePointer=null;
+});
+
+/* =================== GIAO DIỆN TRẬN ĐẤU =================== */
+
+function formatTime(seconds){
+    const n=Math.max(0,Math.ceil(seconds));
+    return `${Math.floor(n/60)}:${String(n%60).padStart(2,"0")}`;
+}
+
+function updateBattleUI(){
+    if(!B)return;
+
+    const p=B.player;
+    const enabled=canControl();
+
+    $("modeLabel").textContent=B.mode==="boss"
+        ?"🤖 BOSS CỰ PHÁO":
+        B.mode==="hard"?"🏆 CAO THỦ":
+        B.mode==="training"?"🎯 LUYỆN TẬP":"⚔️ ĐẤU ĐỘI 3v3";
+
+    $("matchScore").textContent=B.mode==="boss"
+        ?`♥ ${B.lives} mạng • ⏱ ${formatTime(B.timer)}`
+        :`🔵 ${B.score[0]} : ${B.score[1]} 🔴 • ⏱ ${formatTime(B.timer)}`;
+
+    $("hpText").textContent=p.alive
+        ?`${TANKS.find(t=>t.id===p.definition).name} • ${Math.ceil(p.hp)}/${p.maxHP} HP`
+        :`Hồi sinh sau ${Math.max(0,Math.ceil(p.respawn))} giây`;
+
+    $("hpFill").style.width=
+        `${clamp(p.hp/p.maxHP*100,0,100)}%`;
+
+    const buffs=[];
+    if(p.shieldTime>0)buffs.push(`🛡 ${p.shieldTime.toFixed(1)}s`);
+    if(p.powerTime>0)buffs.push(`💥 ${p.powerTime.toFixed(1)}s`);
+    if(p.dashTime>0)buffs.push(`💨 ${p.dashTime.toFixed(1)}s`);
+    if(p.spawnShield>0)buffs.push("Bảo vệ hồi sinh");
+
+    $("statusText").textContent=
+        `Hạ xe: ${B.kills} • Sát thương: ${money(B.damage)}`
+        +(buffs.length?" • "+buffs.join(" / "):"");
+
+    $("aimButton").textContent=input.auto
+        ?"🎯 Ngắm tự động"
+        :"◎ Ngắm tay";
+
+    $("aimButton").style.background=input.auto
+        ?"#28765ae8":"#24516de8";
+
+    $("fire").disabled=!enabled;
+
+    $("dash").disabled=!enabled||p.dashCD>0;
+    $("shield").disabled=!enabled||p.shieldCD>0;
+    $("repair").disabled=!enabled||p.repairCD>0
+        ||p.repairCharges<=0||p.hp>=p.maxHP;
+
+    $("dash").textContent=p.dashCD>0
+        ?`💨 ${Math.ceil(p.dashCD)}s`:"💨 Tăng tốc";
+
+    $("shield").textContent=p.shieldCD>0
+        ?`🛡 ${Math.ceil(p.shieldCD)}s`:"🛡 Lá chắn";
+
+    $("repair").textContent=p.repairCD>0
+        ?`🔧 ${Math.ceil(p.repairCD)}s`
+        :`🔧 Sửa chữa (${p.repairCharges})`;
+}
+
+/* =================== ĐỒ HỌA CHIẾN TRƯỜNG =================== */
+
+function visibleWorld(x,y,pad=100){
+    return x>B.camera.x-pad&&y>B.camera.y-pad
+        &&x<B.camera.x+W+pad&&y<B.camera.y+H+pad;
+}
+
+function drawObstacle(o){
+    if(!o.alive)return;
+
+    const x=o.x,y=o.y,w=o.w,h=o.h;
+
+    if(!visibleWorld(x+w/2,y+h/2,180))return;
+
+    if(o.type==="water"){
+        oval(x+w/2,y+h/2,w/2+7,h/2+8,"#c9e1a5");
+        box(x,y,w,h,"#479fae",23,"#bad8aa");
+        box(x+7,y+7,w-14,h-14,"#69c9cf",20);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(x+7,y+7,w-14,h-14,20);
+        ctx.clip();
+
+        ctx.strokeStyle="#c6fff085";ctx.lineWidth=2;
+
+        for(let i=0;i<5;i++){
+            const yy=y+18+i*19;
+            const offset=Math.sin(time*2+i)*7;
+
+            ctx.beginPath();
+            ctx.moveTo(x+12+offset,yy);
+            ctx.quadraticCurveTo(x+w/2,yy-5,x+w-17+offset,yy);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+
+        oval(x+w-20,y+12,10,5,"#66a565");
+        oval(x+18,y+h-9,8,4,"#7db266");
+        return;
+    }
+
+    box(x+5,y+8,w,h,"#31554438",8);
+
+    if(o.type==="stone"){
+        box(x,y,w,h,"#829b88",8,"#4c715e");
+        box(x+4,y+3,w-8,h-9,"#bfccb0",7,"#d8e2bd");
+
+        ctx.strokeStyle="#899b83";ctx.lineWidth=2;
+
+        const vertical=w>h;
+
+        if(vertical){
+            for(let xx=x+35;xx<x+w;xx+=40){
+                ctx.beginPath();
+                ctx.moveTo(xx,y+4);ctx.lineTo(xx,y+h-7);
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.moveTo(x+4,y+h/2);
+            ctx.lineTo(x+w-4,y+h/2);
+            ctx.stroke();
+        }else{
+            for(let yy=y+34;yy<y+h;yy+=40){
+                ctx.beginPath();
+                ctx.moveTo(x+4,yy);ctx.lineTo(x+w-4,yy);
+                ctx.stroke();
+            }
+
+            ctx
+            .beginPath();
+            ctx.moveTo(x+w/2,y+4);
+            ctx.lineTo(x+w/2,y+h-7);
+            ctx.stroke();
+        }
+
+        // Rêu và điểm sáng trên đá.
+        box(x+8,y+6,Math.min(w-16,25),5,"#dbe8c0",2);
+        oval(x+w-12,y+h-10,9,5,"#7faa78");
+        return;
+    }
+
+    if(o.type==="crate"){
+        box(x,y,w,h,"#bd8c50",5,"#725b3b");
+        box(x+4,y+4,w-8,h-8,"#d1a66a",3,"#f0ca8f");
+
+        ctx.strokeStyle="#96703f";
+        ctx.lineWidth=4;
+
+        ctx.beginPath();
+        ctx.moveTo(x+7,y+7);
+        ctx.lineTo(x+w-7,y+h-7);
+
+        ctx.moveTo(x+w-7,y+7);
+        ctx.lineTo(x+7,y+h-7);
+        ctx.stroke();
+
+        box(x+3,y+3,w-6,5,"#edc38a",2);
+        box(x+3,y+h-8,w-6,5,"#98703f",2);
+
+        for(const [xx,yy] of [
+            [x+6,y+6],
+            [x+w-6,y+6],
+            [x+6,y+h-6],
+            [x+w-6,y+h-6]
+        ]){
+            oval(xx,yy,2,2,"#67583f");
+        }
+
+        if(o.hp<o.maxHP){
+            const ratio=clamp(o.hp/o.maxHP,0,1);
+
+            box(x,y-9,w,4,"#576c4f",2);
+            box(x,y-9,w*ratio,4,"#f5d184",2);
+
+            ctx.strokeStyle="#836441";
+            ctx.lineWidth=2;
+
+            ctx.beginPath();
+            ctx.moveTo(x+w*.25,y+h*.15);
+            ctx.lineTo(x+w*.45,y+h*.43);
+            ctx.lineTo(x+w*.3,y+h*.58);
+            ctx.lineTo(x+w*.5,y+h*.82);
+            ctx.stroke();
+        }
+    }
+}
+
+/* =================== XE TĂNG HOẠT HÌNH =================== */
+
+function drawTankBody(t){
+    ctx.save();
+    ctx.translate(t.x,t.y);
+
+    // Bóng dưới thân.
+    oval(4,7,t.r+9,t.r+3,"#22463440");
+
+    if(t.hurt>0){
+        ctx.globalAlpha=.65+.25*Math.sin(time*70);
+    }
+
+    ctx.save();
+    ctx.rotate(t.body);
+
+    // Hai dải xích.
+    for(const yy of [-24,14]){
+        box(-30,yy,59,11,"#344b4f",5,"#1d383e");
+        box(-25,yy+2,49,6,"#65767a",3);
+
+        const shift=(t.track*.18)%8;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(-28,yy+1,55,9,4);
+        ctx.clip();
+
+        ctx.strokeStyle="#b1b9a0";
+        ctx.lineWidth=2;
+
+        for(let xx=-34+shift;xx<35;xx+=8){
+            ctx.beginPath();
+            ctx.moveTo(xx,yy+2);
+            ctx.lineTo(xx,yy+9);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    // Khung xe.
+    box(-26,-18,52,36,"#486761",8,"#263f42");
+    box(-24,-16,48,32,t.color,7,"#d9e3b2");
+
+    // Mũi và đuôi.
+    poly([
+        [15,-15],[28,-9],[28,9],[15,15]
+    ],t.color,"#5c745e",2);
+
+    box(-27,-11,9,22,"#667b71",3,"#355047");
+    box(-23,-8,4,16,"#b0b89a",2);
+
+    // Những mảng giáp.
+    box(-13,-14,25,6,"#fff0b566",3);
+    box(-12,9,23,5,"#31574e50",2);
+
+    for(const xx of [-18,14]){
+        oval(xx,-11,2.2,2.2,"#eff4bf");
+        oval(xx,11,2.2,2.2,"#60775c");
+    }
+
+    // Đèn đầu xe.
+    box(24,-11,4,6,"#fff4bc",2);
+    box(24,5,4,6,"#fff4bc",2);
+
+    ctx.restore();
+
+    // Tháp pháo quay độc lập.
+    ctx.save();
+    ctx.rotate(t.turret);
+
+    // Nòng.
+    box(3,-6,36,12,"#637b7c",3,"#2d4d54");
+    box(6,-4,28,5,"#d7e0c7",2);
+
+    const plasma=t.definition==="plasma";
+    const bomber=t.definition==="bomber";
+
+    box(
+        29,
+        bomber?-9:-7,
+        bomber?15:12,
+        bomber?18:14,
+        plasma?"#aaa1e9":"#b6c4b4",
+        3,
+        "#405b62"
+    );
+
+    box(39,-5,5,10,plasma?"#bdffff":"#3c5558",2);
+
+    // Tháp pháo.
+    oval(0,0,17,16,"#486a63","#29474c",2);
+    oval(-1,-2,15,14,t.color,"#e4e8b3",2);
+    oval(-4,-5,8,6,"#eef7c055");
+    oval(-5,3,5,5,"#5d7d78","#d4e2bf",1);
+
+    // Biểu tượng từng xe.
+    const icon=t.definition==="scout"?"ϟ":
+        t.definition==="fortress"?"◆":
+        t.definition==="bomber"?"✦":
+        t.definition==="plasma"?"◈":"★";
+
+    txt(icon,2,-2,13,"#fff0b4","#527073");
+
+    ctx.restore();
+    ctx.restore();
+}
+
+function drawBossTank(t){
+    ctx.save();
+    ctx.translate(t.x,t.y);
+
+    oval(7,10,62,48,"#213b454d");
+
+    if(t.hurt>0){
+        ctx.globalAlpha=.7+.2*Math.sin(time*65);
+    }
+
+    ctx.save();
+    ctx.rotate(t.body);
+
+    // Xích lớn.
+    for(const yy of [-43,26]){
+        box(-55,yy,110,18,"#334750",7,"#233744");
+        box(-48,yy+3,95,12,"#6c7b83",4);
+
+        const shift=(t.track*.14)%13;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(-52,yy+2,104,14,5);
+        ctx.clip();
+
+        ctx.strokeStyle="#c1c6b5";
+        ctx.lineWidth=3;
+
+        for(let xx=-65+shift;xx<65;xx+=13){
+            ctx.beginPath();
+            ctx.moveTo(xx,yy+3);
+            ctx.lineTo(xx,yy+15);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    // Giáp thân.
+    poly([
+        [-46,-31],[32,-33],[54,-16],
+        [54,16],[32,33],[-46,31],[-55,15],[-55,-15]
+    ],"#939fa6","#314b5b",4);
+
+    poly([
+        [-37,-25],[28,-27],[40,-14],
+        [40,14],[28,27],[-37,25]
+    ],"#bac0b6","#6e8490",2);
+
+    box(-46,-22,15,44,"#617a88",4,"#c1cbbb");
+
+    // Mảng giáp vàng.
+    for(const yy of [-25,16]){
+        box(-18,yy,48,9,"#d8b87b",3,"#7e7768");
+        box(-14,yy+1,38,3,"#ffe4a8",1);
+    }
+
+    // Đèn và ống xả.
+    for(const yy of [-21,15]){
+        box(43,yy,10,7,"#ffdd91",2,"#80795f");
+        box(-56,yy,10,7,"#526a76",2,"#2d4857");
+    }
+
+    ctx.restore();
+
+    // Cụm ba nòng xoay.
+    ctx.save();
+    ctx.rotate(t.turret);
+
+    for(const yy of [-17,-5,7]){
+        box(8,yy,52,10,"#6e8394",3,"#354f63");
+        box(21,yy+2,33,4,"#c1c8c7",2);
+        box(49,yy-2,16,14,"#c7ad89",3,"#4e6075");
+        box(60,yy+1,7,8,"#384b63",2);
+    }
+
+    poly([
+        [-26,-25],[18,-26],[32,-14],
+        [32,14],[18,26],[-26,25],[-35,10],[-35,-10]
+    ],"#788a9d","#304d63",3);
+
+    poly([
+        [-20,-20],[15,-21],[25,-10],
+        [25,10],[15,21],[-20,20],[-28,8],[-28,-8]
+    ],"#a7b1b8","#d3d5be",2);
+
+    // Lõi năng lượng.
+    ctx.shadowColor="#8ff0ff";
+    ctx.shadowBlur=12;
+
+    oval(-3,0,12,12,"#5bc5de","#d3ffff",2);
+    txt("ϟ",-3,0,20,"#ecffff","#4b8ba8");
+
+    ctx.shadowBlur=0;
+
+    for(const [xx,yy] of [[-20,-13],[-20,13],[15,-14],[15,14]]){
+        oval(xx,yy,3,3,"#f9d99a","#7a8174",1);
+    }
+
+    ctx.restore();
+    ctx.restore();
+}
+
+function drawTank(t){
+    if(!visibleWorld(t.x,t.y,150))return;
+
+    if(!t.alive){
+        if(t.boss)return;
+
+        // Xác xe mờ, biến mất khi hồi sinh.
+        ctx.save();
+        ctx.globalAlpha=.35;
+        ctx.translate(t.x,t.y);
+        ctx.rotate(t.body);
+
+        oval(0,4,30,24,"#3c5551");
+        box(-24,-16,48,32,"#6b7267",6,"#3e4e4b");
+        box(-6,-8,20,16,"#889083",5);
+        box(8,-4,21,8,"#54655d",2);
+
+        ctx.restore();
+
+        if(t.player&&t.respawn<20){
+            txt(
+                `Hồi sinh ${Math.max(0,Math.ceil(t.respawn))}s`,
+                t.x,t.y-47,15,"#e1faff","#405d72"
+            );
+        }
+
+        return;
+    }
+
+    if(t.dashTime>0&&Math.hypot(t.vx,t.vy)>30){
+        const a=t.body;
+        const backX=t.x-Math.cos(a)*(t.r+10);
+        const backY=t.y-Math.sin(a)*(t.r+10);
+
+        ctx.save();
+        ctx.globalAlpha=.65;
+
+        poly([
+            [backX-Math.sin(a)*11,backY+Math.cos(a)*11],
+            [
+                backX-Math.cos(a)*(23+Math.sin(time*35)*7),
+                backY-Math.sin(a)*(23+Math.sin(time*35)*7)
+            ],
+            [backX+Math.sin(a)*11,backY-Math.cos(a)*11]
+        ],"#a9eafa");
+
+        ctx.restore();
+    }
+
+    if(t.boss)drawBossTank(t);
+    else drawTankBody(t);
+
+    // Vòng phân biệt đội.
+    oval(
+        t.x,t.y,
+        t.r+7,t.r+7,
+        null,
+        t.team===0?"#69d0f18c":"#eb9a818c",
+        t.player?3:2
+    );
+
+    if(t.shieldTime>0||t.spawnShield>0){
+        ctx.save();
+
+        const protection=t.spawnShield>0;
+        ctx.globalAlpha=.5+.15*Math.sin(time*7);
+
+        oval(
+            t.x,t.y,t.r+14,t.r+14,
+            protection?"#d0ffff15":"#93dfff22",
+            protection?"#d6ffff":"#8de1ff",
+            3
+        );
+
+        ctx.restore();
+    }
+
+    if(t.powerTime>0){
+        const a=time*2.7;
+
+        for(let i=0;i<3;i++){
+            const angle=a+i*Math.PI*2/3;
+            oval(
+                t.x+Math.cos(angle)*(t.r+10),
+                t.y+Math.sin(angle)*(t.r+10),
+                3.5,3.5,"#ffe896"
+            );
+        }
+    }
+
+    const barW=t.boss?112:66;
+    const barY=t.y-t.r-20;
+    const ratio=clamp(t.hp/t.maxHP,0,1);
+
+    box(
+        t.x-barW/2-1,barY-1,
+        barW+2,8,"#233f4edb",4
+    );
+
+    if(ratio>0){
+        box(
+            t.x-barW/2,barY,
+            Math.max(2,barW*ratio),6,
+            t.team===0?"#a3e89e":"#ffb69a",
+            3
+        );
+    }
+
+    txt(
+        t.player?S.name:t.name,
+        t.x,barY-12,
+        t.boss?15:11,
+        t.player?"#f6fff1":t.team===0?"#ddfaff":"#fff0d7",
+        "#446454"
+    );
+
+    if(t.player){
+        const yy=t.y+t.r+15+Math.sin(time*5)*3;
+
+        poly([
+            [t.x-7,yy+6],[t.x+7,yy+6],[t.x,yy-3]
+        ],"#fff0a1","#73784e",1);
+    }
+}
+
+/* =================== TIẾP TẾ, ĐẠN, HIỆU ỨNG =================== */
+
+function drawPickup(item){
+    if(!visibleWorld(item.x,item.y,70))return;
+
+    const bob=Math.sin(time*3+item.bob)*4;
+
+    oval(item.x,item.y+8,17,7,"#34644736");
+
+    ctx.save();
+    ctx.translate(item.x,item.y-3+bob);
+
+    const color=item.type==="heal"
+        ?"#a6e693"
+        :item.type==="power"?"#f5cf77":"#8edced";
+
+    box(-14,-14,28,28,color,7,"#f7f6c7");
+    box(-10,-10,20,5,"#ffffff55",3);
+
+    txt(
+        item.type==="heal"?"+":item.type==="power"?"ϟ":"◆",
+        0,1,22,"#faffde",
+        item.type==="heal"?"#4d9660":
+        item.type==="power"?"#9c8137":"#568fba"
+    );
+
+    if(item.life<6){
+        ctx.globalAlpha=.4+.3*Math.sin(time*9);
+        oval(0,0,19,19,null,"#fff1b4",2);
+    }
+
+    ctx.restore();
+}
+
+function drawBullets(){
+    for(const b of B.bullets){
+        if(!visibleWorld(b.x,b.y,60))continue;
+
+        const angle=Math.atan2(b.vy,b.vx);
+
+        ctx.save();
+        ctx.translate(b.x,b.y);
+        ctx.rotate(angle);
+
+        ctx.globalAlpha=.45;
+
+        poly([
+            [-4,-b.r],
+            [-23,0],
+            [-4,b.r]
+        ],b.color);
+
+        ctx.globalAlpha=1;
+
+        if(b.color==="#b7b0ff"){
+            box(-8,-3,15,6,"#c1c3ff",3,"#f1ffff");
+            box(-5,-1,11,2,"#ffffff",1);
+        }else{
+            oval(0,0,b.r+3,b.r,b.color,"#fff9d3",1);
+            oval(2,-1,2,1.5,"#ffffff");
+        }
+
+        ctx.restore();
+    }
+}
+
+function updateEffects(dt){
+    if(!B)return;
+
+    B.shake=Math.max(0,B.shake-dt*17);
+
+    for(const p of B.particles){
+        p.life-=dt;
+        p.x+=p.vx*dt;
+        p.y+=p.vy*dt;
+
+        const drag=Math.pow(.1,dt);
+        p.vx*=drag;p.vy*=drag;
+    }
+
+    B.particles=B.particles.filter(p=>p.life>0);
+
+    for(const ring of B.rings){
+        ring.life-=dt;
+    }
+
+    B.rings=B.rings.filter(r=>r.life>0);
+
+    for(const label of B.labels){
+        label.life-=dt;
+        label.y-=29*dt;
+    }
+
+    B.labels=B.labels.filter(l=>l.life>0);
+
+    // Giữ số lượng chữ hiệu ứng ở mức ổn định.
+    if(B.labels.length>90){
+        B.labels.splice(0,B.labels.length-90);
+    }
+}
+
+function drawEffects(){
+    for(const ring of B.rings){
+        if(!visibleWorld(ring.x,ring.y,150))continue;
+
+        const progress=1-ring.life/ring.max;
+
+        ctx.save();
+        ctx.globalAlpha=(1-progress)*.7;
+
+        oval(
+            ring.x,ring.y,
+            8+progress*ring.r,
+            8+progress*ring.r,
+            progress<.3?"#fff0ae":null,
+            ring.color,
+            5*(1-progress)+1
+        );
+
+        ctx.restore();
+    }
+
+    for(const p of B.particles){
+        if(!visibleWorld(p.x,p.y,40))continue;
+
+        ctx.save();
+        ctx.globalAlpha=clamp(p.life*2.4,0,1);
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.life*8+p.vx*.01);
+
+        box(
+            -p.size/2,-p.size/2,
+            p.size,p.size*.75,
+            p.color,1
+        );
+
+        ctx.restore();
+    }
+
+    for(const label of B.labels){
+        if(!visibleWorld(label.x,label.y,90))continue;
+
+        ctx.save();
+        ctx.globalAlpha=clamp(label.life*2,0,1);
+
+        txt(
+            label.text,label.x,label.y,
+            label.text==="HẠ XE!"?23:14,
+            label.color,"#52614d"
+        );
+
+        ctx.restore();
+    }
+}
+
+/* =================== ĐƯỜNG NGẮM =================== */
+
+function drawAim(){
+    const p=B.player;
+
+    if(!p.alive||B.finished||modal)return;
+
+    if(input.auto){
+        const target=nearestEnemy(p,true);
+
+        if(!target||!visibleWorld(target.x,target.y,40))return;
+
+        ctx.save();
+        ctx.globalAlpha=.7;
+
+        const r=target.r+11+Math.sin(time*6)*2;
+
+        oval(target.x,target.y,r,r,null,"#fff0a0",1.5);
+
+        ctx.strokeStyle="#fff0a0";
+        ctx.lineWidth=2;
+
+        for(let i=0;i<4;i++){
+            const angle=i*Math.PI/2;
+            const x1=target.x+Math.cos(angle)*(r-4);
+            const y1=target.y+Math.sin(angle)*(r-4);
+            const x2=target.x+Math.cos(angle)*(r+8);
+            const y2=target.y+Math.sin(angle)*(r+8);
+
+            ctx.beginPath();
+            ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+        return;
+    }
+
+    const target={
+        x:input.aimX,
+        y:input.aimY
+    };
+
+    const maxDistance=560;
+    const d=distance(p,target);
+    const ratio=Math.min(1,maxDistance/Math.max(1,d));
+
+    const endX=p.x+(target.x-p.x)*ratio;
+    const endY=p.y+(target.y-p.y)*ratio;
+
+    ctx.save();
+    ctx.globalAlpha=.35;
+    ctx.strokeStyle="#f0ffcf";
+    ctx.lineWidth=1.5;
+    ctx.setLineDash([6,9]);
+
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y);
+    ctx.lineTo(endX,endY);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+    ctx.globalAlpha=.85;
+
+    oval(target.x,target.y,10,10,null,"#f5ffd4",2);
+
+    ctx.strokeStyle="#f5ffd4";
+
+    ctx.beginPath();
+    ctx.moveTo(target.x-17,target.y);
+    ctx.lineTo(target.x-6,target.y);
+    ctx.moveTo(target.x+6,target.y);
+    ctx.lineTo(target.x+17,target.y);
+    ctx.moveTo(target.x,target.y-17);
+    ctx.lineTo(target.x,target.y-6);
+    ctx.moveTo(target.x,target.y+6);
+    ctx.lineTo(target.x,target.y+17);
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+/* =================== BẢN ĐỒ NHỎ =================== */
+
+function drawMinimap(){
+    const x=W-205,y=149,w=182,h=116;
+    const sx=w/MW,sy=h/MH;
+
+    ctx.save();
+
+    box(x-5,y-5,w+10,h+10,"#193e50e8",12,"#c5e9de");
+    box(x,y,w,h,"#7faa75",7);
+
+    ctx.beginPath();
+    ctx.roundRect(x,y,w,h,7);
+    ctx.clip();
+
+    for(const o of B.obstacles){
+        if(!o.alive)continue;
+
+        ctx.fillStyle=o.type==="water"
+            ?"#5aafc0":
+            o.type==="crate"?"#c5a16a":"#d0d6b2";
+
+        ctx.fillRect(
+            x+o.x*sx,y+o.y*sy,
+            Math.max(2,o.w*sx),Math.max(2,o.h*sy)
+        );
+    }
+
+    for(const item of B.pickups){
+        oval(
+            x+item.x*sx,y+item.y*sy,
+            2,2,"#fff1a5"
+        );
+    }
+
+    for(const t of B.tanks){
+        if(!t.alive)continue;
+
+        oval(
+            x+t.x*sx,y+t.y*sy,
+            t.boss?5:t.player?4:3,
+            t.boss?5:t.player?4:3,
+            t.player?"#f4ffbf":
+            t.team===0?"#77d6ff":"#ff9b7c",
+            t.player?"#345745":null,
+            1
+        );
+    }
+
+    ctx.strokeStyle="#efffcb99";
+    ctx.lineWidth=1;
+
+    ctx.strokeRect(
+        x+B.camera.x*sx,
+        y+B.camera.y*sy,
+        W*sx,H*sy
+    );
+
+    ctx.restore();
+
+    txt("BẢN ĐỒ",x+w/2,y+h+17,11,"#def7ef","#31596d");
+}
+
+function drawBossHealth(){
+    if(B.mode!=="boss")return;
+
+    const boss=B.tanks.find(t=>t.boss);
+    if(!boss)return;
+
+    const x=360,y=146,w=470;
+    const ratio=clamp(boss.hp/boss.maxHP,0,1);
+
+    box(x-9,y-12,w+18,48,"#203f55d9",12,"#c5d7df");
+
+    txt(
+        "BOSS CỰ PHÁO",
+        x+w/2,y-1,
+        14,"#ffe2a0","#59617b"
+    );
+
+    box(x,y+11,w,13,"#193347",6);
+
+    if(ratio>0){
+        const gradient=ctx.createLinearGradient(x,y,x+w,y);
+        gradient.addColorStop(0,"#f09072");
+        gradient.addColorStop(1,"#ffd394");
+
+        box(x,y+11,Math.max(3,w*ratio),13,gradient,6);
+    }
+
+    txt(
+        `${Math.max(0,Math.ceil(boss.hp))}/${boss.maxHP}`,
+        x+w/2,y+18,
+        10,"#fff6df","#765766"
+    );
+}
+
+/* =================== VẼ TRẬN ĐẤU =================== */
+
+function drawBattle(){
+    if(!B)return;
+
+    ctx.fillStyle="#6faece";
+    ctx.fillRect(0,0,W,H);
+
+    ctx.save();
+
+    const shakeX=modal?0:Math.sin(time*81)*B.shake*.45;
+    const shakeY=modal?0:Math.cos(time*73)*B.shake*.35;
+
+    ctx.translate(
+        -B.camera.x+shakeX,
+        -B.camera.y+shakeY
+    );
+
+    ctx.drawImage(B.ground,0,0);
+
+    // Đá và cỏ ở đường biên.
+    for(let i=0;i<18;i++){
+        const xx=55+i*99;
+
+        for(const yy of [34,MH-25]){
+            if(!visibleWorld(xx,yy,50))continue;
+
+            oval(
+                xx,yy,
+                10+(i%3)*3,7+(i%2)*2,
+                i%2?"#a9c098":"#698c78",
+                "#d1dfad",1
+            );
+        }
+    }
+
+    for(const o of B.obstacles)drawObstacle(o);
+    for(const item of B.pickups)drawPickup(item);
+
+    drawAim();
+
+    // Sắp theo vị trí để hình ảnh có chiều sâu nhất quán.
+    [...B.tanks]
+        .sort((a,b)=>a.y-b.y)
+        .forEach(drawTank);
+
+    drawBullets();
+    drawEffects();
+
+    ctx.restore();
+
+    drawMinimap();
+    drawBossHealth();
+
+    if(!B.player.alive&&!B.finished){
+        const remaining=Math.max(0,Math.ceil(B.player.respawn));
+
+        box(
+            W/2-190,H/2-39,
+            380,78,"#153e54d9",17,"#c5eef0"
+        );
+
+        txt(
+            "XE CỦA BẠN ĐÃ BỊ HẠ",
+            W/2,H/2-14,21,
+            "#ffe3b0","#496378"
+        );
+
+        txt(
+            B.mode==="boss"&&B.lives<=0
+                ?"Đã hết mạng"
+                :`Hồi sinh sau ${remaining} giây`,
+            W/2,H/2+16,17,
+            "#def7ff","#496378"
+        );
+    }
+}
+
+/* =================== CẬP NHẬT CHIẾN ĐẤU =================== */
+
+function separateTanks(){
+    // Tách nhẹ các xe bị chồng lên nhau, không đẩy xuyên tường.
+    for(let i=0;i<B.tanks.length;i++){
+        const a=B.tanks[i];
+        if(!a.alive)continue;
+
+        for(let j=i+1;j<B.tanks.length;j++){
+            const b=B.tanks[j];
+            if(!b.alive)continue;
+
+            let dx=b.x-a.x;
+            let dy=b.y-a.y;
+            let d=Math.hypot(dx,dy);
+
+            const minimum=(a.r+b.r)*.83;
+
+            if(d>=minimum)continue;
+
+            if(d<.001){
+                dx=1;dy=0;d=1;
+            }
+
+            const push=Math.min(3,(minimum-d)*.5);
+            const nx=dx/d,ny=dy/d;
+
+            const ax=a.x-nx*push;
+            const ay=a.y-ny*push;
+            const bx=b.x+nx*push;
+            const by=b.y+ny*push;
+
+            if(!blocked(ax,ay,a.r)){
+                a.x=ax;a.y=ay;
+            }
+
+            if(!blocked(bx,by,b.r)){
+                b.x=bx;b.y=by;
+            }
+        }
+    }
+}
+
+function updatePlayer(dt){
+    const p=B.player;
+    if(!p.alive)return;
+
+    let dx=input.x;
+    let dy=input.y;
+
+    if(keys["a"]||keys["arrowleft"])dx-=1;
+    if(keys["d"]||keys["arrowright"])dx+=1;
+    if(keys["w"]||keys["arrowup"])dy-=1;
+    if(keys["s"]||keys["arrowdown"])dy+=1;
+
+    moveTank(p,dx,dy,dt);
+
+    if(input.auto){
+        const target=nearestEnemy(p,true);
+
+        if(target){
+            aimTank(p,target,dt,1);
+        }else if(Math.hypot(p.vx,p.vy)>1){
+            p.turret=lerpAngle(p.turret,p.body,dt*7);
+        }
+    }else{
+        if(input.hasScreenAim){
+            input.aimX=input.screenX+B.camera.x;
+            input.aimY=input.screenY+B.camera.y;
+        }
+
+        const angle=Math.atan2(
+            input.aimY-p.y,
+            input.aimX-p.x
+        );
+
+        p.turret=lerpAngle(p.turret,angle,dt*20);
+    }
+
+    if(
+        (input.fire||input.mouseFire||keys[" "])
+        &&p.shotCD<=0
+    ){
+        shoot(p);
+    }
+}
+
+function updateCamera(dt){
+    const p=B.player;
+    const targetX=clamp(p.x-W/2,0,MW-W);
+    const targetY=clamp(p.y-H/2,0,MH-H);
+
+    const blend=1-Math.exp(-dt*8);
+
+    B.camera.x+=(targetX-B.camera.x)*blend;
+    B.camera.y+=(targetY-B.camera.y)*blend;
+}
+
+function updateBattle(dt){
+    if(!B)return;
+
+    if(B.finished){
+        updateEffects(dt);
+        return;
+    }
+
+    // Mở menu tạm dừng toàn bộ trận và hồi chiêu.
+    if(modal)return;
+
+    B.elapsed+=dt;
+    B.timer=Math.max(0,B.timer-dt);
+
+    updateEffects(dt);
+
+    for(const t of B.tanks){
+        updateTankTimers(t,dt);
+    }
+
+    updatePlayer(dt);
+
+    for(const t of B.tanks){
+        if(!t.player&&t.alive){
+            updateBot(t,dt);
+        }
+    }
+
+    separateTanks();
+    updateBullets(dt);
+    updatePickups(dt);
+    updateCamera(dt);
+    checkEnd();
+}
+
+/* =================== VÒNG LẶP GAME =================== */
+
+let lastFrame=performance.now();
+let accumulator=0;
+let uiClock=0;
+let energyClock=0;
+
+const STEP=1/90;
+
+function frame(now){
+    requestAnimationFrame(frame);
+
+    const raw=(now-lastFrame)/1000;
+    lastFrame=now;
+
+    if(document.hidden){
+        accumulator=0;
+        return;
+    }
+
+    // Giới hạn bước thời gian, tránh nhảy vật lý khi trình duyệt bị khựng.
+    const dt=clamp(raw,0,.06);
+
+    time+=dt;
+    uiClock+=dt;
+    energyClock+=dt;
+
+    if(energyClock>=5){
+        energyClock=0;
+        regen();
+    }
+
+    if(toastEnd>0&&now>=toastEnd){
+        $("toast").style.opacity=0;
+        toastEnd=0;
+    }
+
+    if(scene==="battle"&&B){
+        accumulator+=dt;
+        let steps=0;
+
+        while(accumulator>=STEP&&steps<7){
+            updateBattle(STEP);
+            accumulator-=STEP;
+            steps++;
+
+            if(scene!=="battle"||!B){
+                accumulator=0;
+                break;
+            }
+        }
+
+        if(steps>=7){
+            accumulator=Math.min(accumulator,STEP);
+        }
+    }else{
+        accumulator=0;
+    }
+
+    if(uiClock>=.1){
+        uiClock=0;
+
+        if(scene==="battle"&&B){
+            updateBattleUI();
+        }
+    }
+
+    ctx.clearRect(0,0,W,H);
+
+    if(scene==="lobby"){
+        drawLobby();
+    }else if(scene==="battle"&&B){
+        drawBattle();
+    }
+}
+
+/* =================== KHỞI ĐỘNG VÀ LƯU =================== */
+
+addEventListener("pagehide",save);
+
+document.addEventListener("visibilitychange",()=>{
+    if(!document.hidden){
+        lastFrame=performance.now();
+        accumulator=0;
+        regen();
+    }
+});
+
+document.addEventListener("webkitfullscreenchange",fit);
+
+// Hạn chế menu chuột phải trên vùng chơi.
+canvas.addEventListener("contextmenu",event=>{
+    event.preventDefault();
+});
+
+$("joystick").addEventListener("contextmenu",event=>{
+    event.preventDefault();
+});
+
+$("fire").addEventListener("contextmenu",event=>{
+    event.preventDefault();
+});
+
+regen();
+hud();
+save();
+
+log("Chào mừng đến Bão Thép — phiên bản offline.");
+log("Chọn Xưởng Xe Tăng để trang bị và nâng cấp.");
+log("Chọn Đấu Đội hoặc Phụ Bản Boss để xuất kích.");
+
+requestAnimationFrame(frame);
+
+toast(
+    "Chào chỉ huy! Chọn ĐẤU ĐỘI để chơi, hoặc bấm ? để xem hướng dẫn.",
+    5
+);
+
+</script>
+</body>
+</html>
